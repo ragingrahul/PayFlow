@@ -1,0 +1,44 @@
+name: Product or engineering change
+description: Track a feature, fix, refactor, schema change, or meaningful documentation change
+title: ''
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this issue as the complete work log. Keep it open until implementation, verification, and documentation are finished.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or outcome
+      description: What needs to change, and why does it matter?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is included? State important exclusions.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance checks
+      description: List observable checks that prove the change is complete.
+      placeholder: |
+        - [ ] Expected behavior works
+        - [ ] Failure cases are handled
+        - [ ] Relevant tests and documentation pass
+    validations:
+      required: true
+  - type: textarea
+    id: decisions
+    attributes:
+      label: Decisions and implementation notes
+      description: Record material decisions, tradeoffs, and files or systems affected while working.
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification and limitations
+      description: Record exact checks performed, their results, and anything intentionally incomplete before closing.
