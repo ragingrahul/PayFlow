@@ -7,6 +7,7 @@ import {
   validatePeriod,
   zeroAmounts,
 } from '../src/lib/payroll';
+import { companyRevisionMap, salaryAt } from './compensationService';
 
 export async function requireCompany(ctx: QueryCtx | MutationCtx, companyId: Id<'companies'>) {
   const company = await ctx.db.get(companyId);
@@ -50,10 +51,11 @@ export async function periodInputs(
   for (const a of adjustments)
     if (!ids.has(a.employeeId))
       throw new Error('An approved adjustment targets an employee ineligible for this period.');
+  const revisions = await companyRevisionMap(ctx, companyId);
   const items = employees.map((e) => ({
     employee: e,
     ...calculatePayroll(
-      e.baseMonthlySalary,
+      salaryAt(e, revisions.get(e._id) ?? [], month, year),
       adjustments.filter((a) => a.employeeId === e._id),
     ),
   }));

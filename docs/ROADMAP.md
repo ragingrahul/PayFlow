@@ -13,9 +13,10 @@
 
 ## Milestone 2 — Payroll Operations
 
-- [ ] Adjustment workflows and compensation editing
-- [ ] Payroll review, approval flow, history polish
-- [ ] Expanded activity feed
+- [x] Pending adjustment submission, approval, rejection, and audit events
+- [x] Effective-dated compensation editing and existing-data migration
+- [x] Payroll review, approval, finalization, and history polish
+- [x] Expanded activity feed and URL-backed period navigation
 
 ## Milestone 3 — Scenario Mode
 

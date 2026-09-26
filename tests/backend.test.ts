@@ -15,6 +15,11 @@ describe('Convex payroll operations', () => {
     const { t, companyId, people } = await setup();
     expect(people).toHaveLength(24);
     expect(await t.mutation(internal.seed.demo, {})).toEqual({ companyId, seeded: false });
+    expect(await t.mutation(internal.migrations.milestone2, {})).toEqual({
+      companies: 1,
+      inserted: 0,
+      updated: 0,
+    });
     const runs = await t.query(api.payroll.list, { companyId });
     expect(runs).toHaveLength(2);
     expect(runs.find((r) => r.month === 8)?.employeeCount).toBe(23);
@@ -78,7 +83,7 @@ describe('Convex payroll operations', () => {
       (await t.query(api.payroll.list, { companyId })).filter((r) => r.month === 9),
     ).toHaveLength(1);
   });
-  it('validates approved adjustments and rolls back negative projections', async () => {
+  it('keeps new adjustments pending, approves safely, and rejects invalid projections', async () => {
     const { t, companyId, people } = await setup();
     const args = {
       companyId,
@@ -90,16 +95,69 @@ describe('Convex payroll operations', () => {
       title: 'Performance bonus',
     };
     const before = await t.query(api.dashboard.summary, { companyId, month: 9, year: 2026 });
-    await t.mutation(api.adjustments.create, args);
+    const adjustmentId = await t.mutation(api.adjustments.create, args);
+    const pending = await t.query(api.dashboard.summary, { companyId, month: 9, year: 2026 });
+    expect(pending.netPay).toBe(before.netPay);
+    expect(pending.adjustments.find((item) => item._id === adjustmentId)?.status).toBe('pending');
+    await t.mutation(api.adjustments.approve, { companyId, adjustmentId, note: 'Checked' });
     const after = await t.query(api.dashboard.summary, { companyId, month: 9, year: 2026 });
     expect(after.netPay - before.netPay).toBe(2000050);
+    await expect(t.mutation(api.adjustments.approve, { companyId, adjustmentId })).rejects.toThrow(
+      'Only pending',
+    );
     await expect(t.mutation(api.adjustments.create, { ...args, amount: -1 })).rejects.toThrow();
+    const unsafeId = await t.mutation(api.adjustments.create, {
+      ...args,
+      type: 'deduction',
+      amount: 999999999,
+      title: 'Unsafe deduction',
+    });
     await expect(
-      t.mutation(api.adjustments.create, { ...args, type: 'deduction', amount: 999999999 }),
+      t.mutation(api.adjustments.approve, { companyId, adjustmentId: unsafeId }),
     ).rejects.toThrow('Net pay');
+    const entries = await t.query(api.adjustments.list, { companyId, month: 9, year: 2026 });
+    expect(entries.find((item) => item._id === unsafeId)?.status).toBe('pending');
     expect((await t.query(api.dashboard.summary, { companyId, month: 9, year: 2026 })).netPay).toBe(
       after.netPay,
     );
+  });
+  it('rejects a pending adjustment without changing payroll', async () => {
+    const { t, companyId, people } = await setup();
+    const before = await t.query(api.dashboard.summary, { companyId, month: 9, year: 2026 });
+    const adjustmentId = await t.mutation(api.adjustments.create, {
+      companyId,
+      employeeId: people[0]._id,
+      month: 9,
+      year: 2026,
+      type: 'bonus',
+      amount: 50000,
+      title: 'Not approved',
+    });
+    await t.mutation(api.adjustments.reject, {
+      companyId,
+      adjustmentId,
+      note: 'Insufficient evidence',
+    });
+    const after = await t.query(api.dashboard.summary, { companyId, month: 9, year: 2026 });
+    expect(after.netPay).toBe(before.netPay);
+    expect(after.adjustments.find((item) => item._id === adjustmentId)?.status).toBe('rejected');
+    const staleId = await t.mutation(api.adjustments.create, {
+      companyId,
+      employeeId: people[0]._id,
+      month: 9,
+      year: 2026,
+      type: 'bonus',
+      amount: 50000,
+      title: 'Stale pending entry',
+    });
+    const runId = await t.mutation(api.payroll.create, { companyId, month: 9, year: 2026 });
+    await t.mutation(api.payroll.generate, { companyId, runId });
+    await expect(
+      t.mutation(api.adjustments.approve, { companyId, adjustmentId: staleId }),
+    ).rejects.toThrow('already been calculated');
+    await expect(
+      t.mutation(api.adjustments.reject, { companyId, adjustmentId: staleId }),
+    ).resolves.toBe(staleId);
   });
   it('rejects late adjustments against a calculated snapshot', async () => {
     const { t, companyId, people } = await setup();
@@ -166,14 +224,81 @@ describe('Convex payroll operations', () => {
   it('failed generation leaves a clean draft', async () => {
     const { t, companyId, people } = await setup();
     const runId = await t.mutation(api.payroll.create, { companyId, month: 9, year: 2026 });
-    await t.run((ctx) => ctx.db.patch(people[0]._id, { baseMonthlySalary: -1 }));
+    await t.run(async (ctx) => {
+      const revision = await ctx.db
+        .query('compensationRevisions')
+        .withIndex('by_employee_period', (q) => q.eq('employeeId', people[0]._id))
+        .first();
+      await ctx.db.patch(revision!._id, { monthlySalary: -1 });
+    });
     await expect(t.mutation(api.payroll.generate, { companyId, runId })).rejects.toThrow(
-      'Base salary',
+      'Monthly salary',
     );
     const result = await t.query(api.payroll.detail, { companyId, runId });
     expect(result.run.status).toBe('draft');
     expect(result.items).toHaveLength(0);
     expect(result.run.totalNetPay).toBe(0);
+  });
+  it('uses effective-dated salary revisions and protects calculated periods', async () => {
+    const { t, companyId, people } = await setup();
+    const priya = people.find((person) => person.firstName === 'Priya')!;
+    await expect(
+      t.mutation(api.employees.reviseCompensation, {
+        companyId,
+        employeeId: priya._id,
+        monthlySalary: 10000000,
+        effectiveMonth: 1,
+        effectiveYear: 2024,
+        reason: 'Before joining',
+      }),
+    ).rejects.toThrow('before the employee joined');
+    const before = await t.query(api.dashboard.summary, { companyId, month: 10, year: 2026 });
+    await t.mutation(api.employees.reviseCompensation, {
+      companyId,
+      employeeId: priya._id,
+      monthlySalary: 12000000,
+      effectiveMonth: 10,
+      effectiveYear: 2026,
+      reason: 'Annual review',
+    });
+    const after = await t.query(api.dashboard.summary, { companyId, month: 10, year: 2026 });
+    expect(after.netPay - before.netPay).toBe(500000);
+    const october = (await t.query(api.payroll.list, { companyId })).find(
+      (run) => run.month === 10 && run.year === 2026,
+    )!;
+    await t.mutation(api.payroll.generate, { companyId, runId: october._id });
+    const detail = await t.query(api.payroll.detail, { companyId, runId: october._id });
+    expect(detail.items.find((item) => item.employeeId === priya._id)?.basePay).toBe(12000000);
+    await expect(
+      t.mutation(api.employees.reviseCompensation, {
+        companyId,
+        employeeId: priya._id,
+        monthlySalary: 12500000,
+        effectiveMonth: 10,
+        effectiveYear: 2026,
+        reason: 'Late edit',
+      }),
+    ).rejects.toThrow('calculated payroll');
+  });
+  it('approves and finalizes payroll only through adjacent transitions', async () => {
+    const { t, companyId } = await setup();
+    const runId = await t.mutation(api.payroll.create, { companyId, month: 9, year: 2026 });
+    await expect(t.mutation(api.payroll.approve, { companyId, runId })).rejects.toThrow(
+      'transition',
+    );
+    await t.mutation(api.payroll.generate, { companyId, runId });
+    await t.mutation(api.payroll.approve, { companyId, runId });
+    expect((await t.query(api.payroll.detail, { companyId, runId })).run.status).toBe('approved');
+    await t.mutation(api.payroll.finalize, { companyId, runId });
+    const result = await t.query(api.payroll.detail, { companyId, runId });
+    expect(result.run.status).toBe('processed');
+    expect(result.run.processedAt).toEqual(expect.any(Number));
+    await expect(t.mutation(api.payroll.finalize, { companyId, runId })).rejects.toThrow(
+      'transition',
+    );
+    const activity = await t.query(api.activity.list, { companyId });
+    expect(activity.some((event) => event.action === 'approved')).toBe(true);
+    expect(activity.some((event) => event.action === 'finalized')).toBe(true);
   });
   it('excludes inactive and future employees, and detects invalid adjustment targets', async () => {
     const { t, companyId, people } = await setup();

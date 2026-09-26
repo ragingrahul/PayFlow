@@ -2,43 +2,29 @@
 
 ## Active
 
-### ISSUE-004 — Historical generation uses current compensation
+No confirmed Milestone 2 defects.
 
-Severity: Medium (known M1 scope limit)
-Status: Open; planned M2 design
-Area: Compensation eligibility
+## Intentional scope limitations
 
-Description: Employees store current salary/status without effective-dated revisions or termination dates.
+No auth/access control, multi-company switching, general employee profile editing, effective-dated employment status/termination, hourly/day proration, taxes/EPF/ESI, bank payments, PDF, OpenAI, Inkeep, or Resend. Reopening or recalculating a calculated run is not supported. No dark theme is configured. Local backend and frontend processes must be running. No production-readiness or public deployment claim. These are roadmap boundaries, not defects.
 
-Expected behavior: A later production-capable version should reconstruct compensation and eligibility as of the requested payroll period.
-
-Current behavior: Newly calculated periods use current monthly salary and current active status, filtered by joining date. Existing saved payroll snapshots remain stable.
-
-Potential cause: Effective-dated compensation/status model is deliberately not implemented in M1.
-
-Next action: Design salary revisions/effective dates before offering arbitrary historical reruns or prorated payroll.
+## Resolved
 
 ### ISSUE-005 — Period selection resets on reload
 
 Severity: Low
-Status: Open
+Status: Resolved 2026-09-27
 Area: Navigation
 
-Description: Selected month persists during client navigation, not across full reloads.
+Resolution: Validated `?period=YYYY-MM` URL state now drives every subscribed screen and is preserved by navigation links and full reloads.
 
-Expected behavior: Bookmark/share payroll periods through URL parameters.
+### ISSUE-004 — Historical generation uses current compensation
 
-Current behavior: Reload returns to September 2026, the documented demo default.
+Severity: Medium
+Status: Resolved for salary 2026-09-27
+Area: Compensation eligibility
 
-Potential cause: Period state lives in the application shell.
-
-Next action: Move period selection to validated URL state during M2 navigation polish.
-
-## Intentional scope limitations
-
-No auth/access control, multi-company switching, employee editing, full adjustment approval workflow, payroll approval/processing controls, hourly/day proration, taxes/EPF/ESI, bank payments, PDF, OpenAI, Inkeep, or Resend. No dark theme is configured. Local backend and frontend processes must be running. No production-readiness or public deployment claim. These are roadmap boundaries, not completed features.
-
-## Resolved
+Resolution: Added effective-dated compensation revisions, period salary lookup, protected revision writes, and an idempotent existing-data backfill. Saved payroll snapshots remain unchanged. Employment status and termination dates remain a documented scope limitation.
 
 ### ISSUE-001 — Month input did not change the data query
 

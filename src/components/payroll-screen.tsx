@@ -1,7 +1,15 @@
 'use client';
 import { useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
-import { Plus, Calculator, Check, ShieldCheck, ArrowRight, Wallet } from 'lucide-react';
+import {
+  Plus,
+  Calculator,
+  Check,
+  ShieldCheck,
+  ArrowRight,
+  Wallet,
+  LockKeyhole,
+} from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import type { Id } from '../../convex/_generated/dataModel';
 import { useWorkspace, PeriodPicker } from './shell';
@@ -136,8 +144,11 @@ function RunDetail({ runId }: { runId: Id<'payrollRuns'> }) {
   const { company } = useWorkspace();
   const data = useQuery(api.payroll.detail, { companyId: company._id, runId });
   const generate = useMutation(api.payroll.generate);
+  const approve = useMutation(api.payroll.approve);
+  const finalize = useMutation(api.payroll.finalize);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [decision, setDecision] = useState<'approve' | 'finalize' | null>(null);
   if (!data) return <Loading />;
   const { run, items } = data;
   async function calculate() {
@@ -147,6 +158,20 @@ function RunDetail({ runId }: { runId: Id<'payrollRuns'> }) {
       await generate({ companyId: company._id, runId });
     } catch (e) {
       setError(messageOf(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function confirmDecision() {
+    if (!decision) return;
+    setBusy(true);
+    setError(null);
+    try {
+      if (decision === 'approve') await approve({ companyId: company._id, runId });
+      else await finalize({ companyId: company._id, runId });
+      setDecision(null);
+    } catch (cause) {
+      setError(messageOf(cause));
     } finally {
       setBusy(false);
     }
@@ -172,8 +197,24 @@ function RunDetail({ runId }: { runId: Id<'payrollRuns'> }) {
             {draft ? <span className="step-number">2</span> : <Check size={14} />}Calculate & review
           </span>
           <i />
+          <span
+            className={run.status === 'approved' || run.status === 'processed' ? 'complete' : ''}
+          >
+            {run.status === 'approved' || run.status === 'processed' ? (
+              <Check size={14} />
+            ) : (
+              <span className="step-number">3</span>
+            )}
+            Approval
+          </span>
+          <i />
           <span className={run.status === 'processed' ? 'complete' : ''}>
-            <span className="step-number">3</span>Approval
+            {run.status === 'processed' ? (
+              <Check size={14} />
+            ) : (
+              <span className="step-number">4</span>
+            )}
+            Finalize
           </span>
         </div>
         {draft ? (
@@ -224,10 +265,46 @@ function RunDetail({ runId }: { runId: Id<'payrollRuns'> }) {
               <ShieldCheck size={19} />
               <p>
                 {run.status === 'processed'
-                  ? 'Historical demo payroll. No bank transfer was made.'
-                  : 'Payroll is saved and ready for review. Approval and finalization arrive in Milestone 2.'}
+                  ? 'This payroll record is final and locked. No bank transfer was made.'
+                  : run.status === 'approved'
+                    ? 'The figures are approved. Finalize to lock this payroll as the completed record.'
+                    : 'Review every employee and total below, then explicitly approve the figures.'}
               </p>
             </div>
+            {run.status === 'ready_for_review' && (
+              <div className="decision-bar">
+                <div>
+                  <strong>Ready for your approval</strong>
+                  <span>Confirm that the people, salaries, and adjustments below are correct.</span>
+                </div>
+                <button
+                  className="button primary"
+                  onClick={() => {
+                    setError(null);
+                    setDecision('approve');
+                  }}
+                >
+                  <ShieldCheck size={17} /> Approve payroll
+                </button>
+              </div>
+            )}
+            {run.status === 'approved' && (
+              <div className="decision-bar">
+                <div>
+                  <strong>Approved and awaiting finalization</strong>
+                  <span>Finalization locks the record. It does not send money.</span>
+                </div>
+                <button
+                  className="button primary"
+                  onClick={() => {
+                    setError(null);
+                    setDecision('finalize');
+                  }}
+                >
+                  <LockKeyhole size={17} /> Finalize record
+                </button>
+              </div>
+            )}
           </>
         )}
       </section>
@@ -287,6 +364,39 @@ function RunDetail({ runId }: { runId: Id<'payrollRuns'> }) {
             <span>Snapshot saved in Convex</span>
           </div>
         </section>
+      )}
+      {decision && (
+        <Modal
+          title={decision === 'approve' ? 'Approve this payroll?' : 'Finalize this payroll record?'}
+          onClose={() => {
+            if (!busy) setDecision(null);
+          }}
+        >
+          <p className="muted">
+            {periodLabel(run.month, run.year)} · {run.employeeCount} people
+          </p>
+          <div className="confirmation-total">
+            <span>Total net payroll</span>
+            <strong>{inr(run.totalNetPay)}</strong>
+          </div>
+          <div className="notice">
+            {decision === 'approve' ? <ShieldCheck size={20} /> : <LockKeyhole size={20} />}
+            <p>
+              {decision === 'approve'
+                ? 'This confirms that you reviewed the calculated figures. You can then finalize the record.'
+                : 'This permanently marks the saved payroll record as processed. PayFlow does not contact a bank or move money.'}
+            </p>
+          </div>
+          <ErrorMessage message={error} />
+          <div className="modal-actions">
+            <button className="button" disabled={busy} onClick={() => setDecision(null)}>
+              Cancel
+            </button>
+            <button className="button primary" disabled={busy} onClick={confirmDecision}>
+              {busy ? 'Saving…' : decision === 'approve' ? 'Confirm approval' : 'Finalize record'}
+            </button>
+          </div>
+        </Modal>
       )}
     </>
   );

@@ -1,6 +1,7 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { createDraft, generateRun, requireCompany } from './payrollService';
+import { createDraft, generateRun, recordActivity, requireCompany } from './payrollService';
+import { assertTransition } from '../src/lib/payroll';
 export const list = query({
   args: { companyId: v.id('companies') },
   handler: async (ctx, { companyId }) => {
@@ -37,5 +38,47 @@ export const generate = mutation({
     if (!run || run.companyId !== companyId)
       throw new Error('Payroll run not found in this company.');
     return generateRun(ctx, run);
+  },
+});
+
+export const approve = mutation({
+  args: { companyId: v.id('companies'), runId: v.id('payrollRuns') },
+  handler: async (ctx, { companyId, runId }) => {
+    await requireCompany(ctx, companyId);
+    const run = await ctx.db.get(runId);
+    if (!run || run.companyId !== companyId)
+      throw new Error('Payroll run not found in this company.');
+    assertTransition(run.status, 'approved');
+    await ctx.db.patch(runId, { status: 'approved', approvedAt: Date.now() });
+    await recordActivity(
+      ctx,
+      companyId,
+      'payroll',
+      'approved',
+      `Approved payroll for ${run.month}/${run.year} · ${run.employeeCount} people.`,
+      runId,
+    );
+    return runId;
+  },
+});
+
+export const finalize = mutation({
+  args: { companyId: v.id('companies'), runId: v.id('payrollRuns') },
+  handler: async (ctx, { companyId, runId }) => {
+    await requireCompany(ctx, companyId);
+    const run = await ctx.db.get(runId);
+    if (!run || run.companyId !== companyId)
+      throw new Error('Payroll run not found in this company.');
+    assertTransition(run.status, 'processed');
+    await ctx.db.patch(runId, { status: 'processed', processedAt: Date.now() });
+    await recordActivity(
+      ctx,
+      companyId,
+      'payroll',
+      'finalized',
+      `Finalized payroll record for ${run.month}/${run.year}. No payment was sent.`,
+      runId,
+    );
+    return runId;
   },
 });

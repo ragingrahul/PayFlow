@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import {
   Search,
   ArrowUpRight,
@@ -10,14 +10,17 @@ import {
   Briefcase,
   CalendarDays,
   Wallet,
+  PencilLine,
+  TrendingUp,
 } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import { useWorkspace } from './shell';
-import { Avatar, Badge, PageHeader, Loading, Empty } from './ui';
+import { Avatar, Badge, PageHeader, Loading, Empty, Modal, ErrorMessage, messageOf } from './ui';
 import { inr, shortDate, humanize, periodLabel } from '@/lib/format';
+import { parseInr } from '@/lib/payroll';
 export function PeopleScreen() {
-  const { company } = useWorkspace();
-  const people = useQuery(api.employees.list, { companyId: company._id });
+  const { company, month, year } = useWorkspace();
+  const people = useQuery(api.employees.list, { companyId: company._id, month, year });
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('all');
   if (!people) return <Loading />;
@@ -81,7 +84,10 @@ export function PeopleScreen() {
                 {filtered.map((e) => (
                   <tr key={e._id}>
                     <td>
-                      <Link className="person-cell" href={`/people/${e._id}`}>
+                      <Link
+                        className="person-cell"
+                        href={`/people/${e._id}?period=${year}-${String(month).padStart(2, '0')}`}
+                      >
                         <Avatar name={`${e.firstName} ${e.lastName}`} />
                         <span>
                           <strong>
@@ -95,14 +101,14 @@ export function PeopleScreen() {
                     <td>
                       <span className="type-pill">{humanize(e.employmentType)}</span>
                     </td>
-                    <td className="numeric">{inr(e.baseMonthlySalary)}</td>
+                    <td className="numeric">{inr(e.currentMonthlySalary)}</td>
                     <td>
                       <Badge value={e.status} />
                     </td>
                     <td>
                       <Link
                         className="icon-button"
-                        href={`/people/${e._id}`}
+                        href={`/people/${e._id}?period=${year}-${String(month).padStart(2, '0')}`}
                         aria-label={`View ${e.firstName} ${e.lastName}`}
                       >
                         <ArrowUpRight size={16} />
@@ -125,8 +131,13 @@ export function PeopleScreen() {
   );
 }
 export function EmployeeScreen({ employeeId }: { employeeId: string }) {
-  const { company } = useWorkspace();
-  const data = useQuery(api.employees.detail, { companyId: company._id, employeeId });
+  const { company, month, year } = useWorkspace();
+  const data = useQuery(api.employees.detail, { companyId: company._id, employeeId, month, year });
+  const revise = useMutation(api.employees.reviseCompensation);
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState('');
   if (data === undefined) return <Loading />;
   if (!data)
     return (
@@ -134,15 +145,40 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
         title="Employee not found"
         description="This employee may not exist in your workspace."
       >
-        <Link href="/people" className="button">
+        <Link href={`/people?period=${year}-${String(month).padStart(2, '0')}`} className="button">
           Back to people
         </Link>
       </Empty>
     );
-  const { employee: e, history, adjustments } = data;
+  const { employee: e, history, adjustments, compensationRevisions } = data;
+  async function submitRevision(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    const form = new FormData(event.currentTarget);
+    try {
+      const [effectiveYear, effectiveMonth] = String(form.get('effectivePeriod'))
+        .split('-')
+        .map(Number);
+      await revise({
+        companyId: company._id,
+        employeeId: e._id,
+        monthlySalary: parseInr(String(form.get('salary'))),
+        effectiveMonth,
+        effectiveYear,
+        reason: String(form.get('reason')),
+      });
+      setEditing(false);
+      setSuccess('Salary revision saved with its effective month.');
+    } catch (cause) {
+      setError(messageOf(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
     <>
-      <Link className="back-link" href="/people">
+      <Link className="back-link" href={`/people?period=${year}-${String(month).padStart(2, '0')}`}>
         <ArrowLeft size={16} />
         All people
       </Link>
@@ -159,6 +195,11 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
         </div>
         <Badge value={e.status} />
       </section>
+      {success && (
+        <p role="status" className="success-message">
+          {success}
+        </p>
+      )}
       <div className="detail-grid">
         <section className="panel">
           <div className="panel-heading">
@@ -191,12 +232,22 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
                 <Wallet size={16} />
                 Monthly base
               </dt>
-              <dd className="large-money">{inr(e.baseMonthlySalary)}</dd>
+              <dd className="large-money">{inr(e.currentMonthlySalary)}</dd>
             </div>
           </dl>
           <p className="panel-note">
-            Agreed monthly compensation. Tax and proration are outside this demo’s scope.
+            Salary shown for {periodLabel(month, year)}. Tax and proration are outside this demo’s
+            scope.
           </p>
+          <button
+            className="button"
+            onClick={() => {
+              setError(null);
+              setEditing(true);
+            }}
+          >
+            <PencilLine size={16} /> Schedule salary change
+          </button>
         </section>
         <section className="panel">
           <div className="panel-heading">
@@ -225,6 +276,33 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
           )}
         </section>
       </div>
+      <section className="panel">
+        <div className="panel-heading">
+          <div>
+            <h2>Compensation timeline</h2>
+            <p className="muted">Each salary applies from its effective month onward.</p>
+          </div>
+          <span className="count-pill">{compensationRevisions.length} revisions</span>
+        </div>
+        {compensationRevisions.length ? (
+          <div className="history-list">
+            {compensationRevisions.map((revision) => (
+              <div key={revision._id}>
+                <div>
+                  <strong>{periodLabel(revision.effectiveMonth, revision.effectiveYear)}</strong>
+                  <small>{revision.reason}</small>
+                </div>
+                <strong>{inr(revision.monthlySalary)}</strong>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Empty
+            title="No salary timeline"
+            description="Run the Milestone 2 migration to backfill compensation history."
+          />
+        )}
+      </section>
       <section className="panel">
         <div className="panel-heading">
           <h2>Adjustments</h2>
@@ -263,6 +341,70 @@ export function EmployeeScreen({ employeeId }: { employeeId: string }) {
           />
         )}
       </section>
+      {editing && (
+        <Modal
+          title="Schedule a salary change"
+          onClose={() => {
+            if (!busy) setEditing(false);
+          }}
+        >
+          <form onSubmit={submitRevision}>
+            <div className="notice">
+              <TrendingUp size={20} />
+              <p>
+                The new amount is used from its effective month. Saved payroll results never change.
+              </p>
+            </div>
+            <div className="form-grid">
+              <label>
+                New monthly salary (INR)
+                <input
+                  name="salary"
+                  inputMode="decimal"
+                  required
+                  pattern="[0-9]+(\.[0-9]{1,2})?"
+                  placeholder="125000.00"
+                />
+              </label>
+              <label>
+                Effective month
+                <input
+                  name="effectivePeriod"
+                  type="month"
+                  min="2000-01"
+                  max="2100-12"
+                  defaultValue={`${year}-${String(month).padStart(2, '0')}`}
+                  required
+                />
+              </label>
+              <label className="form-span">
+                Reason
+                <input
+                  name="reason"
+                  minLength={3}
+                  maxLength={160}
+                  required
+                  placeholder="Annual compensation review"
+                />
+              </label>
+            </div>
+            <ErrorMessage message={error} />
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="button"
+                disabled={busy}
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="button primary" disabled={busy}>
+                {busy ? 'Saving…' : 'Save salary revision'}
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </>
   );
 }

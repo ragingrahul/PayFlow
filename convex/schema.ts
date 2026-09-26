@@ -49,6 +49,17 @@ export default defineSchema({
   })
     .index('by_company', ['companyId'])
     .index('by_company_code', ['companyId', 'employeeCode']),
+  compensationRevisions: defineTable({
+    companyId: v.id('companies'),
+    employeeId: v.id('employees'),
+    monthlySalary: v.number(),
+    effectiveMonth: v.number(),
+    effectiveYear: v.number(),
+    reason: v.string(),
+    createdAt: v.number(),
+  })
+    .index('by_company', ['companyId'])
+    .index('by_employee_period', ['employeeId', 'effectiveYear', 'effectiveMonth']),
   payrollRuns: defineTable({
     companyId: v.id('companies'),
     month: v.number(),
@@ -64,6 +75,7 @@ export default defineSchema({
     createdAt: v.number(),
     calculatedAt: v.optional(v.number()),
     approvedAt: v.optional(v.number()),
+    processedAt: v.optional(v.number()),
   }).index('by_company_period', ['companyId', 'year', 'month']),
   payrollItems: defineTable({
     companyId: v.id('companies'),
@@ -89,6 +101,8 @@ export default defineSchema({
     effectiveMonth: v.number(),
     effectiveYear: v.number(),
     status: v.union(v.literal('pending'), v.literal('approved'), v.literal('rejected')),
+    reviewedAt: v.optional(v.number()),
+    reviewNote: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index('by_company_period', ['companyId', 'effectiveYear', 'effectiveMonth'])

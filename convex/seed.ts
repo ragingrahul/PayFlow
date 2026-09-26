@@ -44,25 +44,36 @@ export const demo = internalMutation({
       createdAt: Date.UTC(2026, 0, 1),
     });
     const ids = [];
-    for (const [i, p] of people.entries())
-      ids.push(
-        await ctx.db.insert('employees', {
-          companyId,
-          employeeCode: `PF-${String(i + 1).padStart(3, '0')}`,
-          firstName: p[0],
-          lastName: p[1],
-          email: `${p[0].toLowerCase()}.${p[1].toLowerCase()}@acme.example`,
-          department: p[2],
-          jobTitle: p[3],
-          employmentType:
-            i === 15 || i === 22 ? 'contractor' : i === 23 ? 'part_time' : 'full_time',
-          joiningDate: i === 23 ? '2026-09-07' : `2025-${String((i % 10) + 1).padStart(2, '0')}-10`,
-          status: 'active',
-          baseMonthlySalary: p[4] * 100,
-          currency: 'INR',
-          createdAt: Date.UTC(2026, 7, 1),
-        }),
-      );
+    for (const [i, p] of people.entries()) {
+      const joiningDate =
+        i === 23 ? '2026-09-07' : `2025-${String((i % 10) + 1).padStart(2, '0')}-10`;
+      const employeeId = await ctx.db.insert('employees', {
+        companyId,
+        employeeCode: `PF-${String(i + 1).padStart(3, '0')}`,
+        firstName: p[0],
+        lastName: p[1],
+        email: `${p[0].toLowerCase()}.${p[1].toLowerCase()}@acme.example`,
+        department: p[2],
+        jobTitle: p[3],
+        employmentType: i === 15 || i === 22 ? 'contractor' : i === 23 ? 'part_time' : 'full_time',
+        joiningDate,
+        status: 'active',
+        baseMonthlySalary: p[4] * 100,
+        currency: 'INR',
+        createdAt: Date.UTC(2026, 7, 1),
+      });
+      ids.push(employeeId);
+      const [effectiveYear, effectiveMonth] = joiningDate.split('-').map(Number);
+      await ctx.db.insert('compensationRevisions', {
+        companyId,
+        employeeId,
+        monthlySalary: p[4] * 100,
+        effectiveMonth,
+        effectiveYear,
+        reason: 'Starting monthly compensation',
+        createdAt: Date.UTC(effectiveYear, effectiveMonth - 1, 1),
+      });
+    }
     const aug = await createDraft(ctx, companyId, 8, 2026);
     await ctx.db.insert('adjustments', {
       companyId,
@@ -83,6 +94,15 @@ export const demo = internalMutation({
     await ctx.db.patch(aug, { status: 'processed' });
     // A genuine salary change after August snapshot, with audit history.
     await ctx.db.patch(ids[2], { baseMonthlySalary: 11500000 });
+    await ctx.db.insert('compensationRevisions', {
+      companyId,
+      employeeId: ids[2],
+      monthlySalary: 11500000,
+      effectiveMonth: 9,
+      effectiveYear: 2026,
+      reason: 'Performance salary revision',
+      createdAt: Date.UTC(2026, 8, 1),
+    });
     await ctx.db.insert('activityEvents', {
       companyId,
       entityType: 'employee',

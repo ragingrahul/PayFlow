@@ -1,5 +1,40 @@
 # Test Log
 
+## 2026-09-27 — Milestone 2
+
+### Automated checks
+
+- `npm test -- --run` — **53 tests passed across 2 files**.
+- `npm run lint` — passed without warnings.
+- `npm run typecheck` — passed.
+- `npm run format` / `npm run format:check` — passed.
+- `npm run build` — passed; 10 routes including `/activity`. The first sandboxed CSS worker attempt could not bind a port; moved only the generated failed Turbopack cache aside and reran with approved local worker access.
+- Adjustment tests verify pending exclusion, approval impact, rejection exclusion, invalid projection rollback, repeated decision rejection, and locked periods.
+- Compensation tests verify effective-period projection, calculated item salary, duplicate/locked safeguards, migration idempotence, and historical snapshots.
+- Payroll tests verify skipped/repeated transition rejection, approval, finalization, timestamps, and activity events.
+
+### Existing-data migration
+
+- First `migrations:milestone2` pass inserted 25 revision records for 24 people (Priya has two historical salaries).
+- Follow-up migration logic aligned 23 earliest backfilled salaries to employee joining months; Anika already began in September.
+- Final idempotence pass returned zero inserts and zero updates.
+- Saved August/September payroll items and totals were not edited.
+
+### Real browser checks
+
+- September payroll displays four clear stages and an approval confirmation with 24 people and ₹21,68,450.50.
+- Confirmation explicitly says approval precedes finalization; finalization copy says no bank transfer occurs.
+- October adjustment dialog explains that submission is pending and has no impact until approval.
+- September’s existing pending adjustment exposes review controls; approval is locked after calculation while rejection remains allowed.
+- Priya’s October detail displays current ₹1,15,000 plus August ₹1,10,000 and September ₹1,15,000 compensation revisions.
+- Activity shows 10 existing events in newest-first order.
+- `period=2026-10` survived direct load, full reload, and generated navigation links.
+- No financial record was changed during browser verification.
+
+### Result
+
+PASS for Milestone 2 scope. Approval/finalization, adjustments, compensation history, migration, activity, and URL state are implemented. Remaining exclusions are recorded in KNOWN_ISSUES.
+
 ## 2026-09-27 — Milestone 1
 
 ### Commands

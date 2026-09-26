@@ -2,7 +2,7 @@
 
 **Payroll that thinks before you pay.**
 
-A real Next.js + Convex payroll foundation for the Modern Stack Hackathon. All money uses integer paise; deterministic services calculate payroll. AI integrations arrive later.
+A real Next.js + Convex payroll operations app for the Modern Stack Hackathon. All money uses integer paise; deterministic services calculate payroll; humans approve financial changes. AI integrations arrive later.
 
 ## Run locally
 
@@ -33,11 +33,12 @@ Open [PayFlow](http://127.0.0.1:3000). Seed is idempotent and never resets exist
 
 1. Dashboard defaults to September 2026, with 24 people and projected payroll of ₹21,68,450.50 on a fresh seed.
 2. People → search Ananya → open her salary, adjustments, and August payroll history.
-3. Payroll → Create payroll → Create draft → Calculate payroll.
-4. Inspect the 24 persisted items and ready-for-review total. Another open dashboard tab updates automatically.
-5. Switch both a dashboard tab and an Adjustments tab to October. Add a bonus and confirm; the other tab’s projection and activity update without refreshing.
+3. Payroll → Create payroll → Calculate → review every item → approve → finalize the record.
+4. Adjustments → submit a pending bonus/reimbursement/deduction → approve or reject it. Only approval changes payroll.
+5. Open a person to inspect payroll history and effective-dated salary revisions or schedule a future salary change.
+6. Open Activity for the full audit trail. The `?period=YYYY-MM` selection survives navigation and reloads.
 
-The current development database already completed this workflow: September is ready for review; October includes a ₹20,000 bonus for Ananya and remains a draft. To demonstrate creation again, use another empty period rather than deleting saved runs.
+The current development database keeps September ready for review so approval remains demonstrable. October includes a ₹20,000 bonus for Ananya and remains a draft. To demonstrate creation again, use another empty period rather than deleting saved runs.
 
 ## Verify
 
@@ -47,7 +48,7 @@ npm run lint
 npm run typecheck
 npm run format:check
 npm run build
-# Requires running Convex and September calculated through the UI:
+# Requires running Convex and the existing September snapshot:
 npm run smoke
 ```
 
@@ -57,15 +58,15 @@ Production preview after building:
 npm start
 ```
 
-Convex must remain running. Hosted deployment is outside M1.
+Convex must remain running. Hosted deployment is outside Milestone 2.
 
 ## Environment
 
 - `NEXT_PUBLIC_CONVEX_URL`: Convex client URL (locally `http://127.0.0.1:3210`). Required by frontend and smoke check.
 - `CONVEX_DEPLOYMENT`: CLI-managed deployment selection in `.env.local`.
-- `NEXT_PUBLIC_CONVEX_SITE_URL`: CLI-generated HTTP actions URL; no HTTP actions in M1.
+- `NEXT_PUBLIC_CONVEX_SITE_URL`: CLI-generated HTTP actions URL; no HTTP actions are used.
 
-No OpenAI, Inkeep, Resend, banking, or authentication keys are required. A missing client URL shows setup instructions, never fake data.
+No OpenAI, Inkeep, Resend, banking, or authentication keys are required. A missing client URL shows setup instructions, never fake data. Existing Milestone 1 workspaces are upgraded with `npx convex run migrations:milestone2`; the migration is idempotent and preserves saved payroll snapshots.
 
 ## Engineering memory
 
@@ -77,4 +78,4 @@ All meaningful features, fixes, refactors, schema changes, and documentation cha
 
 ## Scope
 
-This is an unauthenticated local demo with fictional data. Approval/finalization, employee editing, effective-dated salaries, authentication, proration, compliance, bank transfers, scenarios, AI integrations, PDFs, and email are intentionally outside the foundation. Calculated payroll is immutable; adjustment entry is allowed only before calculation.
+This is an unauthenticated local demo with fictional data. General employee editing, effective-dated employment status, authentication, proration, compliance, bank transfers, scenarios, AI integrations, PDFs, and email remain outside Milestone 2. Calculated payroll is immutable; adjustments and salary revisions that would alter it are blocked.

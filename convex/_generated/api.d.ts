@@ -8,9 +8,12 @@
  * @module
  */
 
+import type * as activity from "../activity.js";
 import type * as adjustments from "../adjustments.js";
+import type * as compensationService from "../compensationService.js";
 import type * as dashboard from "../dashboard.js";
 import type * as employees from "../employees.js";
+import type * as migrations from "../migrations.js";
 import type * as payroll from "../payroll.js";
 import type * as payrollService from "../payrollService.js";
 import type * as seed from "../seed.js";
@@ -23,9 +26,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  activity: typeof activity;
   adjustments: typeof adjustments;
+  compensationService: typeof compensationService;
   dashboard: typeof dashboard;
   employees: typeof employees;
+  migrations: typeof migrations;
   payroll: typeof payroll;
   payrollService: typeof payrollService;
   seed: typeof seed;

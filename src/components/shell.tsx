@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useConvexConnectionState } from 'convex/react';
 import {
   LayoutDashboard,
@@ -15,6 +15,7 @@ import {
   Building2,
   PanelLeftClose,
   Menu,
+  History,
 } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import type { Doc } from '../../convex/_generated/dataModel';
@@ -35,15 +36,27 @@ const nav = [
   { href: '/people', label: 'People', icon: Users },
   { href: '/payroll', label: 'Payroll', icon: Wallet },
   { href: '/adjustments', label: 'Adjustments', icon: SlidersHorizontal },
+  { href: '/activity', label: 'Activity', icon: History },
   { href: '/scenarios', label: 'Scenarios', icon: FlaskConical, future: true },
   { href: '/copilot', label: 'Copilot', icon: Sparkles, future: true },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
   const company = useQuery(api.workspace.current);
   const path = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const connection = useConvexConnectionState();
-  const [period, setPeriodState] = useState({ month: 9, year: 2026 });
   const [open, setOpen] = useState(false);
+  const requestedPeriod = searchParams.get('period') ?? '';
+  const requestedYear = Number(requestedPeriod.slice(0, 4));
+  const parsedPeriod =
+    /^\d{4}-(0[1-9]|1[0-2])$/.test(requestedPeriod) &&
+    requestedYear >= 2000 &&
+    requestedYear <= 2100
+      ? requestedPeriod
+      : '2026-09';
+  const [year, month] = parsedPeriod.split('-').map(Number);
+  const periodQuery = `?period=${parsedPeriod}`;
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') setOpen(false);
@@ -59,7 +72,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         Skip to content
       </a>
       <aside className={`sidebar ${open ? 'sidebar-open' : ''}`}>
-        <Link href="/" className="brand" onClick={() => setOpen(false)}>
+        <Link href={`/${periodQuery}`} className="brand" onClick={() => setOpen(false)}>
           <span className="brand-mark">
             <span /> <span /> <span />
           </span>
@@ -79,7 +92,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           {nav.map(({ href, label, icon: Icon, future }) => (
             <Link
               key={href}
-              href={href}
+              href={`${href}${periodQuery}`}
               onClick={() => setOpen(false)}
               aria-current={
                 (href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined
@@ -104,12 +117,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <br />
               Coming in Milestone 4.
             </p>
-            <Link href="/copilot">
+            <Link href={`/copilot${periodQuery}`}>
               Meet your copilot <ArrowUpRight size={15} />
             </Link>
           </div>
           <Link
-            href="/settings"
+            href={`/settings${periodQuery}`}
             className="nav-item"
             aria-current={path === '/settings' ? 'page' : undefined}
           >
@@ -174,8 +187,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <WorkspaceContext.Provider
               value={{
                 company,
-                ...period,
-                setPeriod: (month, year) => setPeriodState({ month, year }),
+                month,
+                year,
+                setPeriod: (nextMonth, nextYear) => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set('period', `${nextYear}-${String(nextMonth).padStart(2, '0')}`);
+                  router.replace(`${path}?${params.toString()}`, { scroll: false });
+                },
               }}
             >
               {children}
@@ -184,7 +202,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </main>
         <footer className="app-footer">
           <span>Payroll that thinks before you pay.</span>
-          <span>PayFlow · Foundation</span>
+          <span>PayFlow · Payroll operations</span>
         </footer>
       </div>
     </div>

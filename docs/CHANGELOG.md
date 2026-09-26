@@ -1,5 +1,26 @@
 # Changelog
 
+## Milestone 2 — 2026-09-27
+
+### Added
+
+- Pending adjustment submission with explicit approval/rejection, notes, validation, and activity.
+- Effective-dated compensation revisions, employee salary timeline, protected salary editing, and idempotent existing-data migration.
+- Payroll approval and finalization confirmations with adjacent transition guards and audit events.
+- Full Activity page and validated URL-backed payroll period navigation.
+- Three additional backend workflow tests; 53 tests now pass.
+
+### Changed
+
+- Payroll calculation resolves salary from the applicable compensation revision.
+- People lists/details display compensation for the selected period.
+- UI copy explains when records affect payroll and that finalization does not send money.
+
+### Fixed
+
+- Selected period now survives reloads and route changes.
+- Historical salary calculation no longer reads only the employee’s current salary.
+
 ## Milestone 1 — 2026-09-27
 
 ### Added

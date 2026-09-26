@@ -9,26 +9,29 @@ Convex is the only payroll store. No localStorage, mock API, browser-side financ
 ## Frontend structure
 
 - `src/app`: route entries, global tokens/styles, layout, loading/error/not-found boundaries.
-- `src/components/shell.tsx`: navigation, company subscription, connection status, shared period selection (default September 2026 demo period).
+- `src/components/shell.tsx`: navigation, company subscription, connection status, and validated `?period=YYYY-MM` state (default September 2026).
 - `src/components/*-screen.tsx`: dashboard, people/detail, payroll, adjustments, and honest future-feature information screens.
 - `src/components/ui.tsx`: badges, avatars, native accessible dialog, error/empty/loading states.
 - `src/components/providers.tsx`: Convex client and explicit missing-configuration instructions.
 - `src/lib/format.ts`: currency/date display only.
 
-Period selection is shared during client navigation, but resets to the demo period on a full reload. A native month field uses `onInput`, verified in the browser; `onChange` did not reliably commit month input in browser testing. Dialogs use native focus trapping and Escape dismissal. Responsive sidebar has mobile navigation and a scrolling desktop rail. The current design is intentionally light-only; no theme toggle.
+Period selection survives navigation, bookmarks, and full reloads. Invalid or out-of-range values fall back to the demo period. A native month field uses `onInput`, verified in the browser. Dialogs use native focus trapping and Escape dismissal. Responsive sidebar has mobile navigation and a scrolling desktop rail. The design is light-only.
 
 ## Backend structure
 
-- `convex/schema.ts`: six implemented tables, validators, indexes.
+- `convex/schema.ts`: seven implemented tables, validators, indexes.
 - `convex/workspace.ts`, `employees.ts`, `dashboard.ts`: workspace and realtime read models.
-- `convex/payroll.ts`: list/detail queries; create/generate mutations.
-- `convex/payrollService.ts`: eligible employee retrieval, approved adjustments, transactions, snapshot persistence, activity.
-- `convex/adjustments.ts`: period query and validated direct HR entry.
+- `convex/payroll.ts`: list/detail queries; create, generate, approve, and finalize mutations.
+- `convex/payrollService.ts`: eligibility, period compensation, approved adjustments, transactions, snapshots, activity.
+- `convex/compensationService.ts`: effective-period ordering and salary resolution.
+- `convex/adjustments.ts`: pending submission, approval, and rejection.
+- `convex/activity.ts`: full workspace activity query.
+- `convex/migrations.ts`: idempotent compensation-history backfill.
 - `convex/seed.ts`: internal CLI-only, idempotent demo initialization. Does not reset data.
 - `convex/_generated`: official Convex-generated types and API bindings; do not hand-edit.
 - `src/lib/payroll.ts`: pure financial engine, currency parsing, aggregation, period validation, state machine.
 
-No Convex actions or external services are needed in M1. Queries remain read-only; mutations are atomic. Testing uses Vitest + convex-test for backend transactions and the browser for real local Convex/UI behavior.
+No Convex actions or external services are needed in M2. Queries remain read-only; mutations are atomic. Testing uses Vitest + convex-test and the real local browser/backend.
 
 ## Financial calculation architecture
 
@@ -40,9 +43,13 @@ The dashboard projects from current eligible employee/adjustment data until a ru
 
 `draft → calculating → ready_for_review → approved → processed`
 
-Only adjacent forward transitions are valid. M1 exposes create draft and calculate only. Generation performs both draft → calculating and calculating → ready_for_review in one mutation: subscribers see either the original draft or the complete results. Any validation/persistence failure rolls back state, items, totals, and activity. Repeating generation is rejected, preventing duplicate items. Approval and processing UI/public mutations remain M2; no money moves.
+Only adjacent forward transitions are valid. Generation performs draft → calculating → ready_for_review atomically. Explicit confirmation invokes ready_for_review → approved and approved → processed separately. Any failure rolls back state, items, totals, and activity. Repeated or skipped transitions are rejected. No money moves.
 
-Calculated snapshots are locked. Add adjustments before calculation or in a future/draft period. Editing and controlled reopening/recalculation need explicit M2 design rather than silently rewriting history.
+Calculated snapshots are locked. Add and approve adjustments before calculation or in a future/draft period. Pending entries in a locked month can still be rejected because rejection cannot alter the snapshot. Controlled reopening/recalculation remains future work.
+
+## Compensation architecture
+
+`compensationRevisions` is an append-only salary timeline. Each record carries a monthly salary, effective month, reason, and audit timestamp. Calculation chooses the newest revision at or before the requested period, then saves that amount in the payroll item. A revision is rejected when its effective month would alter any calculated run. The legacy employee salary field remains for compatibility/fallback; UI and calculation read the revision timeline.
 
 ## Realtime architecture
 
@@ -64,7 +71,7 @@ Future scenarios calculate from isolated hypothetical inputs. They cannot write 
 
 ## Important boundaries and risks
 
-No authentication by explicit milestone scope. This is a development/demo application; do not expose real employee data. Company consistency checks are integrity checks, not user authorization. No effective-dated salaries/statuses means newly generating past payroll uses current compensation; only existing snapshots preserve history. Atomic collection/generation is intentionally sized for the 24-person MVP; pagination/batching is needed before large workspaces.
+No authentication by explicit milestone scope. This is a development/demo application; do not expose real employee data. Company consistency checks are integrity checks, not user authorization. Salaries are effective-dated; employment status and termination are still current-state fields. Atomic collection/generation is intentionally sized for the 24-person MVP; pagination/batching is needed before large workspaces.
 
 ## Setup references
 

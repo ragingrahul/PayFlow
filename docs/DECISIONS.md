@@ -98,7 +98,7 @@ The product scope is explicitly revisited; never remove human confirmation silen
 
 ## DEC-005 — Lock calculated periods; minimal direct HR entry
 
-Date: 2026-09-27. Status: Accepted.
+Date: 2026-09-27. Status: Superseded by DEC-007 for new entries.
 
 ### Context
 
@@ -106,7 +106,7 @@ The foundation must visibly demonstrate that adjustments change realtime payroll
 
 ### Decision
 
-Include a small direct-HR adjustment form with explicit confirmation and immediate approval. Reject adjustments for calculated periods. Keep pending-entry review and controlled recalculation for M2.
+Milestone 1 direct HR entry created an approved adjustment after an explicit confirm-and-save action. Reject adjustments for calculated periods. Add pending-entry review in M2.
 
 ### Reason
 
@@ -119,6 +119,30 @@ Fresh seed leaves September absent for the creation success test and October as 
 ### Do not change unless
 
 M2 adds validated review/reopen semantics and tests.
+
+## DEC-007 — Explicit review and effective-dated compensation
+
+Date: 2026-09-27. Status: Accepted.
+
+### Context
+
+Payroll operators need to understand which proposed changes affect a run and must preserve historical salary truth.
+
+### Decision
+
+New adjustments start pending. Approval revalidates the complete projected payroll atomically; rejection records the decision without affecting totals. Salary changes are append-only compensation revisions with an effective month and reason. Approval and finalization remain separate adjacent payroll transitions.
+
+### Reason
+
+The UI can explain proposal, review, and locked-record states without silently changing money. Period calculations remain reproducible while payroll snapshots stay immutable.
+
+### Consequences
+
+Calculated periods cannot accept new approvals or salary changes that would alter them. Pending entries in locked periods can still be rejected. `processed` describes PayFlow record finalization only; it never means money moved. Existing data requires the idempotent Milestone 2 backfill.
+
+### Do not change unless
+
+A tested reopen/recalculation design preserves the original snapshot and audit trail.
 
 ## DEC-006 — Local-only foundation and honest future screens
 

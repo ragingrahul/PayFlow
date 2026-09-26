@@ -22,6 +22,7 @@ export function DashboardScreen() {
   const data = useQuery(api.dashboard.summary, { companyId: company._id, month, year });
   if (!data) return <Loading />;
   const period = periodLabel(month, year);
+  const periodQuery = `?period=${year}-${String(month).padStart(2, '0')}`;
   const approved = data.adjustments.filter((a) => a.status === 'approved');
   return (
     <>
@@ -32,7 +33,7 @@ export function DashboardScreen() {
         actions={
           <>
             <PeriodPicker />
-            <Link href="/payroll" className="button primary">
+            <Link href={`/payroll${periodQuery}`} className="button primary">
               <Wallet size={16} />
               Open payroll
               <ArrowUpRight size={16} />
@@ -147,7 +148,7 @@ export function DashboardScreen() {
               </span>
               {approved.length} approved adjustments included
             </span>
-            <Link href="/payroll" className="text-link">
+            <Link href={`/payroll${periodQuery}`} className="text-link">
               {data.run ? 'View payroll' : 'Create payroll'}
               <ArrowRight size={16} />
             </Link>
@@ -195,8 +196,7 @@ export function DashboardScreen() {
               <p className="muted">A running record of your workspace</p>
             </div>
             <span className="live-label">
-              <i />
-              Live
+              <i /> Live · <Link href={`/activity${periodQuery}`}>View all</Link>
             </span>
           </div>
           <div className="activity-list">
@@ -233,7 +233,11 @@ export function DashboardScreen() {
               <h2>This month’s adjustments</h2>
               <p className="muted">The details behind the difference</p>
             </div>
-            <Link href="/adjustments" aria-label="View adjustments" className="icon-button">
+            <Link
+              href={`/adjustments${periodQuery}`}
+              aria-label="View adjustments"
+              className="icon-button"
+            >
               <ArrowUpRight size={19} />
             </Link>
           </div>
@@ -270,7 +274,7 @@ export function DashboardScreen() {
           </div>
           <div className="card-footer">
             <span>Only approved entries affect payroll</span>
-            <Link className="text-link" href="/adjustments">
+            <Link className="text-link" href={`/adjustments${periodQuery}`}>
               View all
               <ArrowRight size={15} />
             </Link>

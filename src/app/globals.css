@@ -39,7 +39,8 @@ body {
 }
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 button,
@@ -66,7 +67,8 @@ button:disabled {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-select:focus-visible {
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
@@ -446,6 +448,16 @@ svg {
 .button.primary:hover {
   background: var(--accent-dark);
 }
+.button.danger {
+  border-color: #e4bcbc;
+  color: var(--danger);
+  background: #fff7f6;
+}
+.button.small {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 11px;
+}
 .period-picker input {
   border: 1px solid var(--line);
   background: var(--surface);
@@ -755,6 +767,24 @@ svg {
 }
 .activity-list {
   padding: 0 23px 13px;
+}
+.activity-timeline {
+  padding: 0 23px 13px;
+}
+.activity-timeline .activity-row > div {
+  flex: 1;
+  min-width: 0;
+}
+.activity-timeline .activity-row strong,
+.activity-timeline .activity-row small {
+  display: block;
+}
+.activity-timeline .activity-row strong {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.activity-timeline .activity-row small {
+  margin-top: 3px;
 }
 .activity-row {
   display: flex;
@@ -1133,6 +1163,45 @@ tbody tr:hover {
 .run-progress .complete {
   color: var(--accent);
 }
+.decision-bar {
+  margin: 0 23px 23px;
+  padding: 16px;
+  border: 1px solid #cfe2d5;
+  border-radius: 9px;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.decision-bar strong,
+.decision-bar span {
+  display: block;
+}
+.decision-bar strong {
+  font-size: 12px;
+}
+.decision-bar span {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+.confirmation-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 18px 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.confirmation-total span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.confirmation-total strong {
+  font-size: 20px;
+}
 .step-number {
   border: 1px solid var(--line);
   border-radius: 50%;
@@ -1296,6 +1365,29 @@ tbody tr:hover {
   border: 1px solid var(--line);
   border-radius: 7px;
   min-height: 42px;
+}
+.modal textarea {
+  width: 100%;
+  margin-top: 7px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  resize: vertical;
+}
+.modal > form > label {
+  display: block;
+  margin-top: 18px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.form-span {
+  grid-column: 1 / -1;
+}
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
 }
 .form-grid small {
   font-size: 10px;
@@ -1838,4 +1930,24 @@ tbody tr:hover {
 }
 .sidebar-bottom {
   flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .decision-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .decision-bar .button {
+    width: 100%;
+  }
+  .activity-timeline {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .activity-timeline .badge {
+    display: none;
+  }
+  .row-actions .button {
+    font-size: 0;
+    min-width: 40px;
+  }
 }
