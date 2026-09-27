@@ -38,5 +38,6 @@
 - [x] Employee portal preview and finalized-snapshot payslip presentation
 - [x] Browser print/PDF and server-only Resend delivery with audited outcomes
 - [x] Landing page, responsive transitions, demo flow, and deployment runbook
+- [x] Product-first README, reusable brand assets, real product screenshots, social metadata, launch copy, and distribution log
 - [ ] Live Resend delivery, live Copilot provider check, and public deployment with user-owned credentials
-- [ ] Final submission screenshots/video and hackathon form
+- [ ] Final X/hackathon videos and hackathon form

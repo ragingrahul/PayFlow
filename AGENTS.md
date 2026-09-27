@@ -10,7 +10,7 @@ Next.js, strict TypeScript, Tailwind CSS, Convex, OpenAI Responses API, an alter
 
 ## Mandatory reading order
 
-Before significant changes read: AGENTS.md → docs/PRODUCT.md → docs/ARCHITECTURE.md → docs/ENGINEERING_RULES.md → docs/PROGRESS.md → docs/DECISIONS.md → docs/KNOWN_ISSUES.md → docs/HANDOFF.md. Also inspect CHANGELOG, TEST_LOG, source, and git status. Working code wins over stale documentation; investigate and correct discrepancies.
+Before significant changes read: AGENTS.md → docs/PRODUCT.md → docs/ARCHITECTURE.md → docs/ENGINEERING_RULES.md → docs/PROGRESS.md → docs/DECISIONS.md → docs/KNOWN_ISSUES.md → docs/HANDOFF.md. For launch work also read docs/MARKETING.md, docs/MEDIA_PLAN.md, and docs/DISTRIBUTION_LOG.md. Also inspect CHANGELOG, TEST_LOG, source, and git status. Working code wins over stale documentation; investigate and correct discrepancies.
 
 ## Core constraints
 
@@ -24,7 +24,7 @@ Before significant changes read: AGENTS.md → docs/PRODUCT.md → docs/ARCHITEC
 
 ## Current milestone
 
-See docs/PROGRESS.md: Milestone 5 — employee-to-payslip lifecycle and hackathon polish, implemented locally with external delivery/deployment checks awaiting credentials.
+See docs/PROGRESS.md: Milestone 5 application work and the launch-kit preparation are complete locally. Live provider acceptance, public deployment, video production, and submission remain.
 
 ## Commands
 

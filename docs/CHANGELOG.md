@@ -1,5 +1,23 @@
 # Changelog
 
+## Hackathon launch preparation — 2026-09-27
+
+### Added
+
+- Reusable PayFlow SVG wordmark, product mark, and application icon.
+- Real local screenshots for the landing page, dashboard, Scenario Mode, employee portal, and payslip plus a 1200×630 social preview.
+- X and LinkedIn copy, verified sponsor-handle references, publishing gates, a media production storyboard, and a truthful distribution log.
+- Open Graph and Twitter summary-card metadata.
+
+### Changed
+
+- README now leads with the product story, hero workflow, real visuals, safety model, and architecture before local setup.
+
+### Safety
+
+- Final-launch copy remains blocked on a public URL and live provider acceptance.
+- No external post, link, metric, provider success, or deployment was fabricated.
+
 ## Milestone 5 — 2026-09-27
 
 ### Added

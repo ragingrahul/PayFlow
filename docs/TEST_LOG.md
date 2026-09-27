@@ -1,5 +1,26 @@
 # Test Log
 
+## 2026-09-27 — Hackathon launch-kit preparation
+
+### Automated checks
+
+- `npm test -- --run` — **76 tests passed across 3 files**.
+- `npm run lint`, `npm run typecheck`, and `npm run format:check` — passed.
+- `npx next build --webpack` — passed with 17 routes, including the generated `/icon.svg` metadata asset.
+- Rendered `/welcome` HTML contains the intended description, Open Graph title/description/image, 1200×630 image dimensions, Twitter summary card, and SVG favicon link.
+
+### Asset checks
+
+- Captured landing, dashboard, Scenario Mode, employee portal, and payslip from the real local application with Playwright/Chrome.
+- Dashboard capture shows the persisted 24-person September payroll at ₹21,68,450.50.
+- Scenario capture shows a real October 8% Engineering preview: 8 people, ₹21,10,000 → ₹21,81,200, +₹71,200/month, and +₹8,54,400/year.
+- Portal capture clearly labels the no-auth employee preview; payslip capture honestly shows missing Resend configuration.
+- Distribution log remains entirely unpublished with no invented links or performance metrics.
+
+### Result
+
+PASS for repository launch-kit scope. README, brand assets, screenshots, social metadata, copy, publishing gates, and media plan are reviewable. External posting, video rendering, live providers, and public deployment were not claimed or performed.
+
 ## 2026-09-27 — Milestone 5
 
 ### Automated checks

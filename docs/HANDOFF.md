@@ -2,11 +2,11 @@
 
 ## Current State
 
-Working local Next.js + Convex payroll application through Milestone 5. It covers payroll operations, effective compensation, adjustment review, activity, isolated raise scenarios, human-confirmed Copilot proposals, employee onboarding/offboarding, processed payslips, a portal preview, and hackathon presentation material. September remains ready for review at ₹21,68,450.50; October remains a draft at ₹21,10,000.
+Working local Next.js + Convex payroll application through Milestone 5. It covers payroll operations, effective compensation, adjustment review, activity, isolated raise scenarios, human-confirmed Copilot proposals, employee onboarding/offboarding, processed payslips, a portal preview, and hackathon presentation material. The repository now also contains product-first README content, SVG brand assets, real product screenshots, social metadata, launch copy, media storyboards, and an empty truthful distribution log. September remains ready for review at ₹21,68,450.50; October remains a draft at ₹21,10,000.
 
 ## Current Milestone
 
-Milestone 5 application scope is complete. Live Resend/OpenAI/Inkeep acceptance and a hosted deployment require user-owned credentials and infrastructure.
+Milestone 5 application scope and launch-kit preparation are complete. Live Resend/OpenAI/Inkeep acceptance, hosted deployment, video rendering, and external publishing remain.
 
 ## Last Thing Worked On
 
@@ -14,7 +14,7 @@ Validated employee create/edit/end/reactivate workflows, period-aware eligibilit
 
 ## Next Recommended Task
 
-Configure Resend and one Copilot provider, run their live acceptance flows with synthetic data, then deploy to a user-owned Convex and Next.js host. Add production identity/RBAC before using any real employee data.
+Configure one Copilot provider, run its live acceptance flow with synthetic data, then deploy to a user-owned Convex and Next.js host. Approve the creative direction in `docs/MEDIA_PLAN.md` before creating the first X video. Add production identity/RBAC before using any real employee data.
 
 ## Files Most Relevant
 
@@ -29,6 +29,9 @@ Configure Resend and one Copilot provider, run their live acceptance flows with 
 - `tests/backend.test.ts`
 - `docs/DEMO_SCRIPT.md`
 - `docs/DEPLOYMENT.md`
+- `docs/MARKETING.md`
+- `docs/MEDIA_PLAN.md`
+- `docs/DISTRIBUTION_LOG.md`
 
 ## Important Decisions
 
@@ -40,7 +43,7 @@ The portal is a no-auth employee preview, not a private account. Contractors use
 
 ## Verification Status
 
-76 tests cover lifecycle creation/editing, uniqueness, calculated-history protection, leaving-month inclusion, later exclusion, reactivation, processed-only payslips, and delivery lifecycle in addition to all earlier payroll/Copilot coverage. Lint, typecheck, formatting, Webpack production build, persisted-data smoke, and browser checks pass. The default Turbopack build is limited by this execution sandbox's CSS worker port. See `docs/TEST_LOG.md` for the exact results.
+76 tests cover lifecycle creation/editing, uniqueness, calculated-history protection, leaving-month inclusion, later exclusion, reactivation, processed-only payslips, and delivery lifecycle in addition to all earlier payroll/Copilot coverage. Lint, typecheck, formatting, the 17-route Webpack production build, persisted-data smoke, browser captures, and rendered social metadata pass. The default Turbopack build is limited by this execution sandbox's CSS worker port. See `docs/TEST_LOG.md` for the exact results.
 
 ## Environment Notes
 
