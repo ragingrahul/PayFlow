@@ -1,4 +1,4 @@
-import { FutureScreen } from '@/components/future-screen';
+import { CopilotScreen } from '@/components/copilot-screen';
 export default function Page() {
-  return <FutureScreen kind="copilot" />;
+  return <CopilotScreen />;
 }

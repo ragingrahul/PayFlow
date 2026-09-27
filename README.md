@@ -2,7 +2,7 @@
 
 **Payroll that thinks before you pay.**
 
-A real Next.js + Convex payroll and scenario-planning app for the Modern Stack Hackathon. All money uses integer paise; deterministic services calculate payroll and what-if impact; humans approve financial changes. AI integrations arrive later.
+A real Next.js + Convex payroll application for the Modern Stack Hackathon, with isolated scenarios and a human-approved AI Copilot. All money uses integer paise; deterministic services calculate payroll and impact; AI interprets requests but cannot silently write payroll.
 
 ## Run locally
 
@@ -38,6 +38,7 @@ Open [PayFlow](http://127.0.0.1:3000). Seed is idempotent and never resets exist
 5. Open a person to inspect payroll history and effective-dated salary revisions or schedule a future salary change.
 6. Open Activity for the full audit trail. The `?period=YYYY-MM` selection survives navigation and reloads.
 7. Open Scenarios, choose one employee or a department, enter a percentage raise, and inspect monthly/annual impact. Save or discard the snapshot; real compensation and payroll do not change.
+8. Configure one Copilot provider, open Copilot, ask about the selected period, or request a bonus/reimbursement/deduction. Confirming its structured proposal creates a pending adjustment; approve that separately in Adjustments.
 
 The current development database keeps September ready for review so approval remains demonstrable. October includes a ₹20,000 bonus for Ananya and remains a draft. To demonstrate creation again, use another empty period rather than deleting saved runs.
 
@@ -59,15 +60,19 @@ Production preview after building:
 npm start
 ```
 
-Convex must remain running. Hosted deployment is outside Milestone 3.
+Convex must remain running. Hosted deployment is outside Milestone 4.
 
 ## Environment
 
 - `NEXT_PUBLIC_CONVEX_URL`: Convex client URL (locally `http://127.0.0.1:3210`). Required by frontend and smoke check.
 - `CONVEX_DEPLOYMENT`: CLI-managed deployment selection in `.env.local`.
 - `NEXT_PUBLIC_CONVEX_SITE_URL`: CLI-generated HTTP actions URL; no HTTP actions are used.
+- `COPILOT_PROVIDER`: `openai` (default) or `inkeep`.
+- `OPENAI_API_KEY`: server-only OpenAI key. Required for the OpenAI provider.
+- `OPENAI_MODEL`: optional OpenAI model override; defaults to `gpt-5-mini`.
+- `INKEEP_API_KEY`, `INKEEP_BASE_URL`, `INKEEP_AGENT_ID`: server-only Inkeep Chat API configuration when the Inkeep provider is selected.
 
-No OpenAI, Inkeep, Resend, banking, or authentication keys are required. A missing client URL shows setup instructions, never fake data. Existing Milestone 1 workspaces are upgraded with `npx convex run migrations:milestone2`; the migration is idempotent and preserves saved payroll snapshots.
+Copy the relevant values from `.env.example` into `.env.local` and restart Next.js. Provider secrets remain in the route handler and are never exposed to the browser. If Copilot is not configured, its page shows the missing variables and disables chat; it never generates a fake response. Existing Milestone 1 workspaces are upgraded with `npx convex run migrations:milestone2`; the migration is idempotent and preserves saved payroll snapshots.
 
 ## Engineering memory
 
@@ -79,4 +84,4 @@ All meaningful features, fixes, refactors, schema changes, and documentation cha
 
 ## Scope
 
-This is an unauthenticated local demo with fictional data. General employee editing, effective-dated employment status, authentication, proration, compliance, bank transfers, scenario application, AI integrations, PDFs, and email remain outside Milestone 3. Calculated payroll and saved scenarios are immutable snapshots.
+This is an unauthenticated local demo with fictional data. General employee editing, effective-dated employment status, authentication, proration, compliance, bank transfers, scenario application, salary changes through Copilot, payroll execution through Copilot, PDFs, and email remain outside Milestone 4. Calculated payroll and saved scenarios are immutable snapshots. Copilot can propose adjustments only.

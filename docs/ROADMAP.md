@@ -27,9 +27,10 @@
 
 ## Milestone 4 — AI Payroll Copilot
 
-- [ ] OpenAI and Inkeep tool calling
-- [ ] Natural-language queries and structured action previews
-- [ ] Human approval and self-correction loop
+- [x] OpenAI Responses and Inkeep Chat API tool-calling adapters
+- [x] Natural-language queries and structured adjustment previews
+- [x] Persisted conversations, explicit confirmation, rejection feedback, and self-correction loop
+- [x] Source-version revalidation and pending-adjustment safety gate
 
 ## Milestone 5 — Hackathon Polish
 

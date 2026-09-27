@@ -14,9 +14,9 @@ Traditional payroll requires repetitive forms and tables. PayFlow adds a convers
 
 Company/workspace management, employees, compensation, bonuses, deductions, reimbursements, contractors, payroll runs/history, employee payroll view, scenarios, and AI Payroll Copilot.
 
-## Hero experience (future)
+## Hero experience
 
-“Give Engineering a 7% raise next month.” Retrieve employees, create and validate a structured proposal, calculate impact in application code, preview, wait for explicit approval, apply, retrieve and verify state, record activity. AI cannot silently change money.
+“Give Ananya a ₹20,000 performance bonus this month.” Copilot retrieves current data through controlled tools, prepares a structured proposal, and shows deterministic impact. Human confirmation creates a pending adjustment, which still needs the normal Adjustments approval before payroll changes. Salary and department-raise application remains future work.
 
 ## Non-goals for hackathon MVP
 
@@ -24,4 +24,4 @@ Real bank transfers; full tax compliance; EPF/ESI; government filing; production
 
 ## Demo story
 
-Open the INR demo workspace, inspect employee and payroll metrics, review September payroll, and inspect compensation history. In Scenarios, model an employee or department raise, compare monthly/annual impact, save the snapshot, and discard it without changing payroll. Milestone 4 adds a confirmed AI proposal flow.
+Open the INR demo workspace, inspect employee and payroll metrics, review September payroll, and inspect compensation history. In Scenarios, model an employee or department raise without changing payroll. In Copilot, ask a payroll question or request an October adjustment, inspect the structured proposal, reject it with a correction or confirm it, then approve the resulting pending record in Adjustments.

@@ -473,4 +473,210 @@ describe('Convex payroll operations', () => {
       'not found',
     );
   });
+  it('persists a Copilot proposal and only creates a pending adjustment after confirmation', async () => {
+    const { t, companyId, people } = await setup();
+    const employee = people[0];
+    const before = await t.query(api.dashboard.summary, { companyId, month: 10, year: 2026 });
+    const saved = await t.mutation(api.copilot.recordTurn, {
+      companyId,
+      month: 10,
+      year: 2026,
+      provider: 'openai',
+      userText: `Give ${employee.firstName} a ₹12,500 bonus this month.`,
+      assistantText: 'I prepared a bonus proposal for your review.',
+      proposal: {
+        employeeId: employee._id,
+        adjustmentType: 'bonus',
+        amount: 1250000,
+        title: 'Customer launch bonus',
+        rationale: 'Matches the requested one-time performance reward.',
+      },
+    });
+    expect(saved.proposalId).toBeDefined();
+    const conversation = await t.query(api.copilot.conversation, {
+      companyId,
+      threadId: saved.threadId,
+    });
+    expect(conversation.messages.map((message) => message.role)).toEqual(['user', 'assistant']);
+    expect(conversation.proposals[0]).toMatchObject({
+      status: 'pending',
+      employeeId: employee._id,
+      amount: 1250000,
+      baselineNetPay: before.netPay,
+      projectedNetPay: before.netPay + 1250000,
+    });
+    expect(
+      (await t.query(api.dashboard.summary, { companyId, month: 10, year: 2026 })).netPay,
+    ).toBe(before.netPay);
+    const confirmed = await t.mutation(api.copilot.confirmProposal, {
+      companyId,
+      proposalId: saved.proposalId!,
+    });
+    const adjustments = await t.query(api.adjustments.list, { companyId, month: 10, year: 2026 });
+    expect(adjustments.find((item) => item._id === confirmed.adjustmentId)).toMatchObject({
+      status: 'pending',
+      amount: 1250000,
+      title: 'Customer launch bonus',
+    });
+    expect(
+      (await t.query(api.dashboard.summary, { companyId, month: 10, year: 2026 })).netPay,
+    ).toBe(before.netPay);
+    await expect(
+      t.mutation(api.copilot.confirmProposal, {
+        companyId,
+        proposalId: saved.proposalId!,
+      }),
+    ).rejects.toThrow('Only pending');
+    await t.mutation(api.adjustments.approve, {
+      companyId,
+      adjustmentId: confirmed.adjustmentId,
+      note: 'Reviewed after Copilot confirmation',
+    });
+    expect(
+      (await t.query(api.dashboard.summary, { companyId, month: 10, year: 2026 })).netPay,
+    ).toBe(before.netPay + 1250000);
+  });
+  it('rejects a stale Copilot proposal when payroll inputs change', async () => {
+    const { t, companyId, people } = await setup();
+    const saved = await t.mutation(api.copilot.recordTurn, {
+      companyId,
+      month: 10,
+      year: 2026,
+      provider: 'inkeep',
+      userText: 'Prepare a reimbursement for this employee.',
+      assistantText: 'The reimbursement is ready for review.',
+      proposal: {
+        employeeId: people[0]._id,
+        adjustmentType: 'reimbursement',
+        amount: 500000,
+        title: 'Travel reimbursement',
+        rationale: 'Reimburses the requested travel expense.',
+      },
+    });
+    const adjustmentId = await t.mutation(api.adjustments.create, {
+      companyId,
+      employeeId: people[1]._id,
+      month: 10,
+      year: 2026,
+      type: 'bonus',
+      amount: 100,
+      title: 'Changed source data',
+    });
+    await t.mutation(api.adjustments.approve, { companyId, adjustmentId });
+    await expect(
+      t.mutation(api.copilot.confirmProposal, {
+        companyId,
+        proposalId: saved.proposalId!,
+      }),
+    ).rejects.toThrow('Payroll data changed');
+    const conversation = await t.query(api.copilot.conversation, {
+      companyId,
+      threadId: saved.threadId,
+    });
+    expect(conversation.proposals[0].status).toBe('pending');
+  });
+  it('records Copilot rejection feedback and enforces company and period boundaries', async () => {
+    const { t, companyId, people } = await setup();
+    const saved = await t.mutation(api.copilot.recordTurn, {
+      companyId,
+      month: 10,
+      year: 2026,
+      provider: 'openai',
+      userText: 'Prepare a deduction.',
+      assistantText: 'I prepared the requested deduction.',
+      proposal: {
+        employeeId: people[0]._id,
+        adjustmentType: 'deduction',
+        amount: 10000,
+        title: 'Equipment recovery',
+        rationale: 'Matches the requested deduction.',
+      },
+    });
+    await t.mutation(api.copilot.rejectProposal, {
+      companyId,
+      proposalId: saved.proposalId!,
+      reason: 'Use a reimbursement instead.',
+    });
+    const conversation = await t.query(api.copilot.conversation, {
+      companyId,
+      threadId: saved.threadId,
+    });
+    expect(conversation.proposals[0]).toMatchObject({
+      status: 'rejected',
+      rejectionReason: 'Use a reimbursement instead.',
+    });
+    expect(conversation.messages.at(-1)?.content).toContain('Use a reimbursement instead');
+    await expect(
+      t.mutation(api.copilot.rejectProposal, {
+        companyId,
+        proposalId: saved.proposalId!,
+        reason: 'Try again',
+      }),
+    ).rejects.toThrow('Only pending');
+    const other = await t.run((ctx) =>
+      ctx.db.insert('companies', {
+        name: 'Copilot Other',
+        slug: 'copilot-other',
+        currency: 'INR',
+        country: 'IN',
+        createdAt: Date.now(),
+      }),
+    );
+    await expect(
+      t.query(api.copilot.conversation, { companyId: other, threadId: saved.threadId }),
+    ).rejects.toThrow('not found');
+    await expect(
+      t.mutation(api.copilot.recordTurn, {
+        companyId,
+        month: 9,
+        year: 2026,
+        threadId: saved.threadId,
+        provider: 'openai',
+        userText: 'Continue in another month.',
+        assistantText: 'This should not save.',
+      }),
+    ).rejects.toThrow('another payroll period');
+  });
+  it('serves read-only Copilot context and blocks proposals for locked payroll', async () => {
+    const { t, companyId, people } = await setup();
+    const context = await t.query(api.copilot.aiContext, {
+      companyId,
+      month: 9,
+      year: 2026,
+    });
+    expect(context).toMatchObject({
+      company: { name: 'Acme Studio' },
+      period: { month: 9, year: 2026 },
+      runStatus: 'projected',
+    });
+    expect(context.people).toHaveLength(24);
+    const runId = await t.mutation(api.payroll.create, { companyId, month: 9, year: 2026 });
+    await t.mutation(api.payroll.generate, { companyId, runId });
+    await expect(
+      t.mutation(api.copilot.recordTurn, {
+        companyId,
+        month: 9,
+        year: 2026,
+        provider: 'openai',
+        userText: 'Create a bonus in the locked period.',
+        assistantText: 'This proposal should be rejected by the backend.',
+        proposal: {
+          employeeId: people[0]._id,
+          adjustmentType: 'bonus',
+          amount: 100,
+          title: 'Locked bonus',
+          rationale: 'Attempts to change a calculated period.',
+        },
+      }),
+    ).rejects.toThrow('already been calculated');
+    const answer = await t.mutation(api.copilot.recordTurn, {
+      companyId,
+      month: 9,
+      year: 2026,
+      provider: 'openai',
+      userText: 'What is this payroll total?',
+      assistantText: 'The saved payroll total comes from the calculated snapshot.',
+    });
+    expect(answer.proposalId).toBeUndefined();
+  });
 });

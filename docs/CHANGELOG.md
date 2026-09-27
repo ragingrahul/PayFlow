@@ -1,5 +1,28 @@
 # Changelog
 
+## Milestone 4 — 2026-09-27
+
+### Added
+
+- OpenAI Responses API and alternate Inkeep Chat API tool-calling adapters.
+- Natural-language payroll context, employee lookup, adjustment search, and structured proposal tools.
+- Persisted Copilot conversations, messages, proposals, decisions, and activity.
+- Source-version binding, confirmation-time revalidation, rejection feedback, and correction context.
+- Polished Copilot workspace with proposal cards and honest provider setup state.
+- Nine additional tool/backend checks; 73 tests now pass across three files.
+
+### Changed
+
+- Direct HR entry and confirmed Copilot proposals now share one pending-adjustment validation service.
+- Copilot navigation and sidebar messaging now reflect the active feature.
+- Added the official OpenAI JavaScript SDK.
+
+### Safety
+
+- Providers have read tools and proposal preparation only; they never receive a mutation tool.
+- Human confirmation creates a pending adjustment, which still requires normal Adjustments approval.
+- Stale, repeated, cross-company, cross-period, locked-period, malformed, and unsafe proposals fail atomically.
+
 ## Milestone 3 — 2026-09-27
 
 ### Added

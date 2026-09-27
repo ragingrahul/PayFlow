@@ -12,6 +12,7 @@ export const adjustmentType = v.union(
   v.literal('deduction'),
   v.literal('reimbursement'),
 );
+export const copilotProvider = v.union(v.literal('openai'), v.literal('inkeep'));
 export const amounts = {
   basePay: v.number(),
   bonusTotal: v.number(),
@@ -142,6 +143,50 @@ export default defineSchema({
   })
     .index('by_scenario', ['scenarioId'])
     .index('by_employee', ['employeeId']),
+  copilotThreads: defineTable({
+    companyId: v.id('companies'),
+    month: v.number(),
+    year: v.number(),
+    title: v.string(),
+    provider: copilotProvider,
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_company', ['companyId'])
+    .index('by_company_period', ['companyId', 'year', 'month']),
+  copilotMessages: defineTable({
+    companyId: v.id('companies'),
+    threadId: v.id('copilotThreads'),
+    role: v.union(v.literal('user'), v.literal('assistant')),
+    kind: v.union(v.literal('text'), v.literal('proposal'), v.literal('decision')),
+    content: v.string(),
+    proposalId: v.optional(v.id('copilotProposals')),
+    createdAt: v.number(),
+  }).index('by_thread', ['threadId']),
+  copilotProposals: defineTable({
+    companyId: v.id('companies'),
+    threadId: v.id('copilotThreads'),
+    requestText: v.string(),
+    provider: copilotProvider,
+    status: v.union(v.literal('pending'), v.literal('applied'), v.literal('rejected')),
+    employeeId: v.id('employees'),
+    employeeName: v.string(),
+    month: v.number(),
+    year: v.number(),
+    adjustmentType,
+    amount: v.number(),
+    title: v.string(),
+    rationale: v.string(),
+    baselineNetPay: v.number(),
+    projectedNetPay: v.number(),
+    sourceVersion: v.string(),
+    adjustmentId: v.optional(v.id('adjustments')),
+    rejectionReason: v.optional(v.string()),
+    createdAt: v.number(),
+    decidedAt: v.optional(v.number()),
+  })
+    .index('by_company', ['companyId'])
+    .index('by_thread', ['threadId']),
   activityEvents: defineTable({
     companyId: v.id('companies'),
     entityType: v.string(),

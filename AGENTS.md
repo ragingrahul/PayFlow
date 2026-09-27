@@ -6,7 +6,7 @@ AI-native payroll for small, distributed companies. Current scope is a real, loc
 
 ## Stack
 
-Next.js, strict TypeScript, Tailwind CSS, Convex. OpenAI, Inkeep, and Resend come later.
+Next.js, strict TypeScript, Tailwind CSS, Convex, OpenAI Responses API, and an alternate Inkeep Chat API adapter. Resend comes later.
 
 ## Mandatory reading order
 
@@ -18,13 +18,13 @@ Before significant changes read: AGENTS.md → docs/PRODUCT.md → docs/ARCHITEC
 - Store money in integer paise; deterministic service code calculates payroll.
 - AI must not directly calculate authoritative money or mutate records. AI changes require validated previews and explicit human confirmation.
 - Preserve working functionality. Do not add integrations outside the milestone.
-- No authentication, payment rails, tax compliance, PDF generation, or AI integrations in Milestone 1.
+- No authentication, payment rails, tax compliance, PDF generation, or email delivery. Copilot proposals must use the controlled confirmation boundary.
 - Run verification before claiming completion. Update relevant docs after meaningful changes and rewrite HANDOFF before stopping.
 - Track every planned feature, bug fix, or meaningful product/code change in a GitHub Issue before implementation. Reference the issue number in the commit and close it only after verification and documentation are complete.
 
 ## Current milestone
 
-See docs/PROGRESS.md: Milestone 1 — PayFlow Foundation.
+See docs/PROGRESS.md: Milestone 4 — AI Payroll Copilot, complete and awaiting provider credentials for live external calls.
 
 ## Commands
 

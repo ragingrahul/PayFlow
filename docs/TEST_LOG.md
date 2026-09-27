@@ -1,5 +1,33 @@
 # Test Log
 
+## 2026-09-27 — Milestone 4
+
+### Automated checks
+
+- `npm test -- --run` — **73 tests passed across 3 files**.
+- `npm run lint`, `npm run typecheck`, and `npm run format:check` — passed.
+- `npx next build --webpack` — passed with 11 routes, including dynamic `/api/copilot`. A final Turbopack rerun was blocked by this execution sandbox's worker-port restriction; the standard Turbopack build had passed earlier in the milestone.
+- `npm run smoke` — persisted September payroll still has 24 items and 216845050 paise.
+- Tool checks cover payroll context, employee search, adjustment filters, exact INR parsing, structured proposals, ambiguous targets, malformed amounts, unsafe deductions, and locked periods.
+- Backend checks cover persistence, zero impact before confirmation, pending adjustment creation, later normal approval, duplicate decisions, stale source data, rejection feedback, company isolation, and period isolation.
+
+### Real browser checks
+
+- October Copilot route loaded with the URL period preserved and active navigation.
+- Desktop workspace displayed conversation rail, prompt examples, provider/model identity, and “Human approval on” status.
+- With no provider key, the page named the exact missing environment variable, disabled the composer, and stated that no AI response is simulated.
+- Sidebar no longer marks Copilot as planned.
+- No browser workflow wrote financial or Copilot records.
+
+### External-provider status
+
+- No OpenAI or Inkeep credentials were available, so a live model request was not run.
+- Provider tool loops compile in the production route; deterministic tool execution and all Convex persistence/approval behavior are covered locally.
+
+### Result
+
+PASS for Milestone 4 application scope. Live provider connectivity remains a credential-dependent acceptance check documented in PROGRESS and HANDOFF.
+
 ## 2026-09-27 — Milestone 3
 
 ### Automated checks

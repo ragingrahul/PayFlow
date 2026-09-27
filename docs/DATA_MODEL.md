@@ -30,7 +30,7 @@ Monthly bonus, reimbursement, or deduction with company/employee, optional run, 
 
 ### activityEvents
 
-Durable company, payroll, employee, and adjustment events with entity identifiers, action, message, optional monetary/period metadata, and createdAt. Index: `by_company`. Creation, calculation, approvals, finalization, adjustment decisions, and salary revisions write activity transactionally. The Activity page returns the newest 100. There is no authenticated actor identity in M2.
+Durable company, payroll, employee, adjustment, scenario, and Copilot events with entity identifiers, action, message, optional monetary/period metadata, and createdAt. Index: `by_company`. Financial decisions and proposal lifecycle changes write activity transactionally. The Activity page returns the newest 100. There is no authenticated actor identity in M4.
 
 ### scenarios
 
@@ -40,6 +40,18 @@ Saved what-if summary with company, name, period, target type/identifier, subjec
 
 Affected-person snapshot with scenario/company/employee, display identity, department, baseline/projected base pay, baseline/projected net pay, and changes. Indexes: `by_scenario`, `by_employee`. Saving writes all items transactionally; discard removes them before the scenario header.
 
+### copilotThreads
+
+One persisted conversation for a company and payroll period with title, selected provider, and created/updated timestamps. Indexes: `by_company`, `by_company_period`. A thread cannot be reused across periods.
+
+### copilotMessages
+
+Ordered user/assistant transcript entries with `text | proposal | decision` kind and optional proposal reference. Index: `by_thread`. Rejection feedback is stored as a user decision message so the next provider request can correct the proposal.
+
+### copilotProposals
+
+Validated adjustment proposal with company/thread, provider, employee snapshot, period, adjustment type, integer-paise amount, title/rationale, baseline/projected payroll, exact source-version serialization, `pending | applied | rejected` status, and optional adjustment/rejection decision fields. Indexes: `by_company`, `by_thread`. Confirmation succeeds only when current deterministic inputs exactly match the saved source version.
+
 ## Planned
 
-AI actions, approval requests, and payslips. Effective-dated employment status and termination also remain future work.
+Payslips and employee portal records. Effective-dated employment status and termination also remain future work.

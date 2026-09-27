@@ -38,7 +38,7 @@ const nav = [
   { href: '/adjustments', label: 'Adjustments', icon: SlidersHorizontal },
   { href: '/activity', label: 'Activity', icon: History },
   { href: '/scenarios', label: 'Scenarios', icon: FlaskConical },
-  { href: '/copilot', label: 'Copilot', icon: Sparkles, future: true },
+  { href: '/copilot', label: 'Copilot', icon: Sparkles },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
   const company = useQuery(api.workspace.current);
@@ -89,7 +89,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </div>
         <p className="nav-label">WORKSPACE</p>
         <nav aria-label="Main navigation">
-          {nav.map(({ href, label, icon: Icon, future }) => (
+          {nav.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={`${href}${periodQuery}`}
@@ -101,7 +101,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
             >
               <Icon size={19} aria-hidden />
               <span>{label}</span>
-              {future && <span className="soon-dot" title="Planned feature" />}
             </Link>
           ))}
         </nav>
@@ -115,10 +114,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <p>
               Your AI payroll copilot.
               <br />
-              Coming in Milestone 4.
+              Live with human approval.
             </p>
             <Link href={`/copilot${periodQuery}`}>
-              Meet your copilot <ArrowUpRight size={15} />
+              Open Copilot <ArrowUpRight size={15} />
             </Link>
           </div>
           <Link
@@ -202,7 +201,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </main>
         <footer className="app-footer">
           <span>Payroll that thinks before you pay.</span>
-          <span>PayFlow · Scenario planning</span>
+          <span>PayFlow · Human-approved AI</span>
         </footer>
       </div>
     </div>

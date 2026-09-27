@@ -2,11 +2,11 @@
 
 ## Active
 
-No confirmed Milestone 2 defects.
+No confirmed Milestone 4 defects.
 
 ## Intentional scope limitations
 
-No auth/access control, multi-company switching, general employee profile editing, effective-dated employment status/termination, hourly/day proration, taxes/EPF/ESI, bank payments, PDF, OpenAI, Inkeep, or Resend. Reopening or recalculating a calculated run is not supported. Scenarios support positive percentage raises only and cannot be applied. No dark theme is configured. Local backend and frontend processes must be running. No production-readiness or public deployment claim. These are roadmap boundaries, not defects.
+No auth/access control, multi-company switching, general employee profile editing, effective-dated employment status/termination, hourly/day proration, taxes/EPF/ESI, bank payments, PDF, or Resend. Reopening or recalculating a calculated run is not supported. Scenarios support positive percentage raises only and cannot be applied. Copilot supports adjustment proposals only and cannot approve them. Live OpenAI or Inkeep execution requires server-side credentials; none are present in the verified local environment, so live provider calls remain unexercised while the setup state is active. No dark theme is configured. Local backend and frontend processes must be running. No production-readiness or public deployment claim. These are roadmap boundaries, not defects.
 
 ## Resolved
 

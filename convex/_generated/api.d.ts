@@ -9,8 +9,10 @@
  */
 
 import type * as activity from "../activity.js";
+import type * as adjustmentService from "../adjustmentService.js";
 import type * as adjustments from "../adjustments.js";
 import type * as compensationService from "../compensationService.js";
+import type * as copilot from "../copilot.js";
 import type * as dashboard from "../dashboard.js";
 import type * as employees from "../employees.js";
 import type * as migrations from "../migrations.js";
@@ -28,8 +30,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   activity: typeof activity;
+  adjustmentService: typeof adjustmentService;
   adjustments: typeof adjustments;
   compensationService: typeof compensationService;
+  copilot: typeof copilot;
   dashboard: typeof dashboard;
   employees: typeof employees;
   migrations: typeof migrations;

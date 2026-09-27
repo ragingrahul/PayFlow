@@ -2,47 +2,47 @@
 
 ## Current State
 
-Working local Next.js + Convex payroll and scenario application. Milestones 1–3 are complete: payroll operations, effective compensation, approvals, activity, and isolated raise scenarios. September remains ready for review at ₹21,68,450.50; October remains a draft at ₹21,10,000.
+Working local Next.js + Convex payroll application. Milestones 1–4 are implemented: payroll operations, effective compensation, adjustment review, activity, isolated raise scenarios, and a persisted AI Copilot proposal flow. September remains ready for review at ₹21,68,450.50; October remains a draft at ₹21,10,000.
 
 ## Current Milestone
 
-Milestone 3 complete and verified. Next feature work is Milestone 4 AI Payroll Copilot.
+Milestone 4 application work is complete. Live external-provider execution needs user-supplied credentials. Next product work is Milestone 5 hackathon polish.
 
 ## Last Thing Worked On
 
-Employee/department raise preview, deterministic basis-point calculation, immutable scenario snapshots, affected-person details, discard behavior, tests, browser verification, and documentation.
+OpenAI Responses and Inkeep Chat tool loops, deterministic Copilot tools, persisted conversations/proposals, source-version binding, confirmation/rejection, two-stage adjustment approval, configuration states, tests, and documentation.
 
 ## Next Recommended Task
 
-Design the Copilot tool boundary before connecting a model. Begin with read-only questions and structured proposals. Bind proposals to exact inputs and results; require explicit confirmation and backend revalidation before invoking existing adjustment or compensation mutations.
+Configure either OpenAI or Inkeep and run one live read question plus one proposal/reject/correct/confirm flow. Then begin the employee-facing payslip experience without adding real bank or statutory claims.
 
 ## Files Most Relevant
 
-- `src/lib/payroll.ts`
-- `convex/scenarios.ts`
-- `convex/payrollService.ts`
+- `src/app/api/copilot/route.ts`
+- `src/lib/copilot-provider.ts`
+- `src/components/copilot-screen.tsx`
+- `convex/copilot.ts`
+- `convex/adjustmentService.ts`
 - `convex/schema.ts`
-- `src/components/scenarios-screen.tsx`
-- `src/components/future-screen.tsx`
-- `tests/payroll.test.ts`
+- `tests/copilot.test.ts`
 - `tests/backend.test.ts`
 
 ## Important Decisions
 
-Scenarios are immutable snapshots. Calculated periods use saved payroll items as baseline; draft/future periods use effective inputs. Percentages are integer basis points with half-up paise rounding. No apply mutation exists.
+Provider output is untrusted interpretation. Tools parse INR, resolve employees, and calculate impact in application code. Convex recalculates before saving a proposal and again before confirmation. Confirmation creates a pending adjustment; the existing approval workflow decides whether it affects payroll.
 
 ## Known Limits
 
-Scenarios only model positive percentage raises for one employee or department. They cannot apply changes, model fixed-amount changes, decreases, hiring, termination, taxes, or proration. Authentication and external integrations remain absent.
+Copilot writes only bonus, reimbursement, and deduction proposals for draft/future periods. It cannot approve adjustments, revise salary, apply scenarios, create employees, calculate/finalize payroll, move money, or perform tax/compliance work. The app has no authentication. Live OpenAI/Inkeep calls have not run because no provider credentials are present.
 
 ## Verification Status
 
-64 tests, lint, typecheck, formatting, production build, persisted-data smoke, and browser workflow pass. Browser verification created an 8.25% Engineering scenario for October, confirmed ₹73,425 monthly and ₹8,81,100 annualized impact across eight people, then discarded it. Payroll and compensation totals remained unchanged.
+73 tests, lint, typecheck, formatting, production build, and persisted-data smoke pass. Tests cover tool parsing, read context, proposal persistence, no-impact-before-confirm, pending creation, later normal approval, duplicate decisions, stale data, rejection feedback, locked periods, and company/period isolation. Browser verification covered the October layout, period URL, active navigation, provider/model display, explicit missing-key instructions, disabled composer, and human-approval copy.
 
 ## Environment Notes
 
-Run `npm install`; terminal 1 `npx convex dev`; terminal 2 `npm run seed` then `npm run dev`. Frontend is `http://127.0.0.1:3000`; backend is `http://127.0.0.1:3210`. `.env.local` and `.convex` remain ignored.
+Run `npm install`; terminal 1 `npx convex dev`; terminal 2 `npm run seed` then `npm run dev`. Configure `COPILOT_PROVIDER=openai` plus `OPENAI_API_KEY` (and optional `OPENAI_MODEL`), or select Inkeep and set `INKEEP_API_KEY`, `INKEEP_BASE_URL`, and `INKEEP_AGENT_ID`. Secrets stay server-side. `.env.local` and `.convex` remain ignored.
 
 ## Do Not Accidentally Change
 
-Never add an apply button by directly reusing scenario snapshots. Recalculate against current source data and require explicit confirmation first. Keep money in paise and percentage inputs in basis points. Preserve payroll snapshots, scenario snapshots, and audit activity.
+Never trust model-supplied employee IDs, stored totals, or mutation claims. Keep tool output read-only until `recordTurn` validates it. Keep confirmation bound to `sourceVersion`, reject stale proposals, and preserve the second human approval in Adjustments. Do not expose provider keys with `NEXT_PUBLIC_`.

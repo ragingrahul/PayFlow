@@ -168,6 +168,30 @@ Saved scenarios do not drift when salaries or adjustments later change. Discard 
 
 The apply workflow preserves preview/version binding, explicit human confirmation, and atomic compensation writes.
 
+## DEC-009 — Copilot providers cannot mutate payroll
+
+Date: 2026-09-27. Status: Accepted.
+
+### Context
+
+Natural-language payroll requests are useful, but model output is probabilistic and external providers must not control authoritative employee or money records.
+
+### Decision
+
+Expose bounded read and proposal-preparation tools through a provider-neutral adapter. Run OpenAI Responses or Inkeep Chat orchestration in a server-only Next.js route. Treat every provider result as untrusted input. Re-resolve the employee, parse paise, calculate impact, and persist the proposal in Convex. Bind it to the exact relevant payroll inputs. Require explicit confirmation, revalidate the version, and create a pending adjustment only. Preserve the existing separate adjustment approval.
+
+### Reason
+
+The model can interpret useful language while deterministic application code and two human checkpoints retain authority over payroll.
+
+### Consequences
+
+Copilot cannot directly approve adjustments, revise salaries, apply scenarios, or operate payroll. A source change invalidates an old proposal. External credentials stay in the route handler. OpenAI and Inkeep share the same tools and backend contract. Missing credentials disable chat without a demo-response fallback.
+
+### Do not change unless
+
+A replacement design keeps provider output untrusted, binds approval to current data, records the full decision trail, and never allows a model to bypass human confirmation.
+
 ## DEC-006 — Local-only foundation and honest future screens
 
 Date: 2026-09-27. Status: Accepted.

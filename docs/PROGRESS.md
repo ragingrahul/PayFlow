@@ -1,45 +1,46 @@
 # Current Milestone
 
-Milestone 3 — Scenario Mode
+Milestone 4 — AI Payroll Copilot
 
 # Goal
 
-Let payroll operators model employee or department raises, understand exact monthly and annual impact, and save or discard plans without changing real payroll data.
+Let payroll operators ask natural-language questions and prepare reviewable adjustments while deterministic code retains authority over employees, money, impact, and mutations.
 
 # Current Status
 
-Milestone 3 is implemented and verified locally. Scenario previews calculate from the selected period’s saved payroll snapshot when available, otherwise from effective salaries and approved adjustments. Saved scenarios retain their own item snapshots.
+Milestone 4 is implemented and verified locally. OpenAI Responses function calling is the default provider; an Inkeep Chat API tool-calling adapter uses the same controlled tools. Conversations and proposals persist in Convex. Live external-provider execution awaits user-supplied credentials; the unconfigured browser state is verified and does not simulate responses.
 
 # Completed
 
-- [x] Employee raise scenarios.
-- [x] Department raise scenarios.
-- [x] Integer basis-point parsing and deterministic half-up paise rounding.
-- [x] Live baseline, projected payroll, monthly impact, and annualized impact preview.
-- [x] Saved scenario headers and affected-employee item snapshots.
-- [x] Discard workflow that deletes only scenario records and writes an activity event.
-- [x] Backend isolation tests prove preview/save/discard do not mutate payroll or compensation.
-- [x] Scenario period stays in URL state and switching periods cannot display a scenario from another month.
-- [x] 64 financial/backend tests, lint, typecheck, formatting, production build, persisted-data smoke, and real-browser workflow.
+- [x] OpenAI Responses API tool loop using the official JavaScript SDK and `store: false`.
+- [x] Inkeep OpenAI-compatible Chat API tool loop with server-only credentials.
+- [x] Deterministic read tools for payroll context, employee lookup, and adjustment filtering.
+- [x] Structured bonus, reimbursement, and deduction proposal tool with exact INR-to-paise parsing.
+- [x] Convex-backed conversations, messages, proposal previews, status, and activity.
+- [x] Proposal source snapshot and confirmation-time revalidation.
+- [x] Explicit confirm creates a pending adjustment only; the existing Adjustments approval remains mandatory.
+- [x] Rejection reason becomes conversation context for a corrected follow-up.
+- [x] Honest missing-provider setup state with disabled chat.
+- [x] 73 tests, lint, typecheck, formatting, production build, persisted-data smoke, and browser UI verification.
 
 # In Progress
 
-- None. Milestone 3 verification and handoff are complete.
+- None. Milestone 4 application work is complete.
 
 # Next Actions
 
-1. Implement Milestone 4 AI Payroll Copilot as a proposal layer over controlled PayFlow tools.
-2. Bind every AI proposal to an exact data version and deterministic preview.
-3. Require explicit human confirmation before any existing mutation can run.
+1. Add one provider’s server-side credentials and run live OpenAI or Inkeep conversation checks.
+2. Start Milestone 5 with the employee portal and payslip presentation.
+3. Add Resend only when the payslip artifact and recipient flow are ready.
 
 # Blockers
 
-- None. Local services are configured and working.
+- Live external-provider calls cannot be exercised until `OPENAI_API_KEY` or the three Inkeep variables are supplied. All local deterministic and persistence paths are verified.
 
 # Important Current Context
 
-Scenarios are snapshots only. There is deliberately no “apply scenario” mutation in Milestone 3. October’s browser-verified 8.25% Engineering scenario was discarded after verification; its saved/discarded activity events remain, while payroll and compensation stayed unchanged. All money remains integer paise.
+Copilot never calls arbitrary Convex mutations. Its provider tools read a bounded context and may return one proposal draft. `recordTurn` resolves and recalculates that draft in Convex. `confirmProposal` compares the current source snapshot to the saved proposal, then creates one pending adjustment transactionally. Payroll changes only after a separate adjustment approval.
 
 # Last Verified
 
-2026-09-27 (Asia/Kolkata): 64 tests, lint, typecheck, format check, production build, read-only Convex smoke, live employee/department preview, saved eight-person breakdown, discard confirmation, and source-data isolation.
+2026-09-27 (Asia/Kolkata): 73 tests across three files, lint, typecheck, format check, production build with 11 routes, persisted September smoke at 216845050 paise, and desktop-browser verification of the Copilot setup state and human-approval messaging.
