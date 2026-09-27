@@ -37,7 +37,7 @@ const nav = [
   { href: '/payroll', label: 'Payroll', icon: Wallet },
   { href: '/adjustments', label: 'Adjustments', icon: SlidersHorizontal },
   { href: '/activity', label: 'Activity', icon: History },
-  { href: '/scenarios', label: 'Scenarios', icon: FlaskConical, future: true },
+  { href: '/scenarios', label: 'Scenarios', icon: FlaskConical },
   { href: '/copilot', label: 'Copilot', icon: Sparkles, future: true },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
@@ -202,7 +202,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </main>
         <footer className="app-footer">
           <span>Payroll that thinks before you pay.</span>
-          <span>PayFlow · Payroll operations</span>
+          <span>PayFlow · Scenario planning</span>
         </footer>
       </div>
     </div>

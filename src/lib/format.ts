@@ -24,3 +24,6 @@ export function shortDate(value: string | number) {
 export function humanize(value: string) {
   return value.replaceAll('_', ' ').replace(/^./, (s) => s.toUpperCase());
 }
+export function percentage(basisPoints: number) {
+  return `${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(basisPoints / 100)}%`;
+}

@@ -10,7 +10,7 @@ Convex is the only payroll store. No localStorage, mock API, browser-side financ
 
 - `src/app`: route entries, global tokens/styles, layout, loading/error/not-found boundaries.
 - `src/components/shell.tsx`: navigation, company subscription, connection status, and validated `?period=YYYY-MM` state (default September 2026).
-- `src/components/*-screen.tsx`: dashboard, people/detail, payroll, adjustments, and honest future-feature information screens.
+- `src/components/*-screen.tsx`: dashboard, people/detail, payroll, adjustments, activity, scenarios, and honest future-feature information screens.
 - `src/components/ui.tsx`: badges, avatars, native accessible dialog, error/empty/loading states.
 - `src/components/providers.tsx`: Convex client and explicit missing-configuration instructions.
 - `src/lib/format.ts`: currency/date display only.
@@ -19,7 +19,7 @@ Period selection survives navigation, bookmarks, and full reloads. Invalid or ou
 
 ## Backend structure
 
-- `convex/schema.ts`: seven implemented tables, validators, indexes.
+- `convex/schema.ts`: nine implemented tables, validators, indexes.
 - `convex/workspace.ts`, `employees.ts`, `dashboard.ts`: workspace and realtime read models.
 - `convex/payroll.ts`: list/detail queries; create, generate, approve, and finalize mutations.
 - `convex/payrollService.ts`: eligibility, period compensation, approved adjustments, transactions, snapshots, activity.
@@ -27,6 +27,7 @@ Period selection survives navigation, bookmarks, and full reloads. Invalid or ou
 - `convex/adjustments.ts`: pending submission, approval, and rejection.
 - `convex/activity.ts`: full workspace activity query.
 - `convex/migrations.ts`: idempotent compensation-history backfill.
+- `convex/scenarios.ts`: isolated preview, saved snapshots, detail, and discard.
 - `convex/seed.ts`: internal CLI-only, idempotent demo initialization. Does not reset data.
 - `convex/_generated`: official Convex-generated types and API bindings; do not hand-edit.
 - `src/lib/payroll.ts`: pure financial engine, currency parsing, aggregation, period validation, state machine.
@@ -67,7 +68,7 @@ AI can interpret, query, propose, and explain. No arbitrary record writes, autho
 
 ## Scenario architecture
 
-Future scenarios calculate from isolated hypothetical inputs. They cannot write actual compensation or payroll merely by being created/saved. Applying a scenario requires validated impact, explicit confirmation, and revalidation against current data. No scenario tables or executable UI exist yet.
+Scenarios calculate from isolated hypothetical inputs. A calculated period uses immutable payroll items as its baseline; a draft or future period uses effective compensation and approved adjustments. Raises use integer basis points and half-up paise rounding. `scenarios` stores summary snapshots and `scenarioItems` stores affected-person snapshots, so a saved result remains stable if source data later changes. Discard deletes only those snapshots and records activity. No apply mutation exists.
 
 ## Important boundaries and risks
 

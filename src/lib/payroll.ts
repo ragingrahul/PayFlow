@@ -93,3 +93,25 @@ export function payrollChange(current: number, previous: number): number | null 
   money(previous);
   return previous === 0 ? null : Math.round(((current - previous) / previous) * 1000) / 10;
 }
+
+/** Percentage raises use integer basis points: 100 = 1%, 10_000 = 100%. */
+export function validateRaiseBasisPoints(value: number) {
+  if (!Number.isInteger(value) || value < 1 || value > 10_000)
+    throw new Error('Raise must be between 0.01% and 100%.');
+  return value;
+}
+
+export function parsePercentage(input: string) {
+  if (!/^\d+(\.\d{1,2})?$/.test(input.trim()))
+    throw new Error('Enter a percentage with up to two decimal places.');
+  const [whole, fraction = ''] = input.trim().split('.');
+  const basisPoints = Number(BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0')));
+  return validateRaiseBasisPoints(basisPoints);
+}
+
+export function applyRaise(amount: number, basisPoints: number) {
+  money(amount);
+  validateRaiseBasisPoints(basisPoints);
+  const change = Number((BigInt(amount) * BigInt(basisPoints) + 5_000n) / 10_000n);
+  return { change: money(change), projected: addMoney(amount, change) };
+}

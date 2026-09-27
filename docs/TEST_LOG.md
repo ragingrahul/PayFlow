@@ -1,5 +1,29 @@
 # Test Log
 
+## 2026-09-27 — Milestone 3
+
+### Automated checks
+
+- `npm test -- --run` — **64 tests passed across 2 files**.
+- `npm run lint`, `npm run typecheck`, and `npm run format:check` — passed.
+- `npm run build` — passed with all 10 routes.
+- `npm run smoke` — persisted September payroll still has 24 items and 216845050 paise.
+- Percentage checks cover parsing, bounds, precision, and half-up paise rounding.
+- Backend checks cover employee/department preview, eligible targets, approved adjustments, stable saved snapshots, discard, validation, company boundaries, activity, and source-data isolation.
+
+### Real browser checks
+
+- October Scenario page loaded with the URL period preserved and no planned-feature marker.
+- Default 8% employee preview updated live from ₹21,10,000 to ₹21,18,400.
+- Engineering 8.25% preview affected eight people: ₹73,425 monthly and ₹8,81,100 annualized impact.
+- Saved snapshot displayed every affected employee with current/projected base and monthly impact.
+- Discard confirmation explicitly stated salaries/payroll remain unchanged; scenario list returned to empty after discard.
+- Read-only smoke after browser mutations confirmed payroll stayed unchanged.
+
+### Result
+
+PASS for Milestone 3 scope. Scenarios preview, save, and discard safely; applying a scenario is intentionally unavailable.
+
 ## 2026-09-27 — Milestone 2
 
 ### Automated checks

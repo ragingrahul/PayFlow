@@ -20,8 +20,10 @@
 
 ## Milestone 3 — Scenario Mode
 
-- [ ] Salary and department raise simulations
-- [ ] Financial impact preview; save/discard scenarios
+- [x] Employee and department raise simulations
+- [x] Live financial impact preview with deterministic percentage rounding
+- [x] Stable saved scenario snapshots, affected-person breakdown, and discard workflow
+- [x] Scenario isolation from compensation and payroll
 
 ## Milestone 4 — AI Payroll Copilot
 

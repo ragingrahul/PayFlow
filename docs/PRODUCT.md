@@ -24,4 +24,4 @@ Real bank transfers; full tax compliance; EPF/ESI; government filing; production
 
 ## Demo story
 
-Milestone 1: open the INR demo workspace, inspect real employee and payroll metrics, open a person, create September 2026 payroll, calculate approved bonuses/reimbursements/deductions, inspect persisted employee items, observe dashboard and activity updates without refreshing. Future milestones add a raise simulation and a confirmed AI bonus proposal.
+Open the INR demo workspace, inspect employee and payroll metrics, review September payroll, and inspect compensation history. In Scenarios, model an employee or department raise, compare monthly/annual impact, save the snapshot, and discard it without changing payroll. Milestone 4 adds a confirmed AI proposal flow.

@@ -6,6 +6,8 @@ import {
   assertTransition,
   validatePeriod,
   payrollChange,
+  applyRaise,
+  parsePercentage,
   type RunStatus,
   type AdjustmentType,
 } from '../src/lib/payroll';
@@ -113,5 +115,20 @@ describe('period and state invariants', () => {
         if (j === i + 1) expect(() => assertTransition(statuses[i], statuses[j])).not.toThrow();
         else expect(() => assertTransition(statuses[i], statuses[j])).toThrow();
       }
+  });
+});
+
+describe('scenario percentage calculations', () => {
+  it('parses percentage input into basis points', () => {
+    expect(parsePercentage('8')).toBe(800);
+    expect(parsePercentage('8.25')).toBe(825);
+    expect(parsePercentage('0.01')).toBe(1);
+  });
+  it.each(['0', '-1', '1.001', '101', '', 'ten'])('rejects invalid raise %s', (value) =>
+    expect(() => parsePercentage(value)).toThrow(),
+  );
+  it('applies raises using deterministic half-up paise rounding', () => {
+    expect(applyRaise(100000, 825)).toEqual({ change: 8250, projected: 108250 });
+    expect(applyRaise(101, 50)).toEqual({ change: 1, projected: 102 });
   });
 });

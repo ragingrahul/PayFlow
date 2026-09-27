@@ -107,6 +107,41 @@ export default defineSchema({
   })
     .index('by_company_period', ['companyId', 'effectiveYear', 'effectiveMonth'])
     .index('by_employee', ['employeeId']),
+  scenarios: defineTable({
+    companyId: v.id('companies'),
+    name: v.string(),
+    month: v.number(),
+    year: v.number(),
+    targetType: v.union(v.literal('employee'), v.literal('department')),
+    employeeId: v.optional(v.id('employees')),
+    department: v.optional(v.string()),
+    subjectLabel: v.string(),
+    raiseBasisPoints: v.number(),
+    affectedEmployeeCount: v.number(),
+    baselineBasePay: v.number(),
+    projectedBasePay: v.number(),
+    basePayChange: v.number(),
+    baselineNetPay: v.number(),
+    projectedNetPay: v.number(),
+    netPayChange: v.number(),
+    annualNetPayChange: v.number(),
+    createdAt: v.number(),
+  }).index('by_company_period', ['companyId', 'year', 'month']),
+  scenarioItems: defineTable({
+    companyId: v.id('companies'),
+    scenarioId: v.id('scenarios'),
+    employeeId: v.id('employees'),
+    employeeName: v.string(),
+    department: v.string(),
+    baselineBasePay: v.number(),
+    projectedBasePay: v.number(),
+    basePayChange: v.number(),
+    baselineNetPay: v.number(),
+    projectedNetPay: v.number(),
+    netPayChange: v.number(),
+  })
+    .index('by_scenario', ['scenarioId'])
+    .index('by_employee', ['employeeId']),
   activityEvents: defineTable({
     companyId: v.id('companies'),
     entityType: v.string(),

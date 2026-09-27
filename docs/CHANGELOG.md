@@ -1,5 +1,25 @@
 # Changelog
 
+## Milestone 3 — 2026-09-27
+
+### Added
+
+- Employee and department raise simulations with live monthly and annual impact.
+- Integer basis-point percentage parsing and deterministic half-up paise rounding.
+- Persisted scenario and affected-person snapshots with a full detail view.
+- Scenario discard confirmation and saved/discarded activity events.
+- Eleven additional calculation/backend checks; 64 tests now pass.
+
+### Changed
+
+- Scenarios navigation now opens the working scenario workspace.
+- Calculated periods use immutable payroll items as the baseline; draft/future periods use effective compensation and approved adjustments.
+
+### Safety
+
+- Preview, save, and discard have no path to compensation or payroll mutations.
+- Applying scenarios remains outside Milestone 3.
+
 ## Milestone 2 — 2026-09-27
 
 ### Added

@@ -1,4 +1,4 @@
-import { FutureScreen } from '@/components/future-screen';
+import { ScenariosScreen } from '@/components/scenarios-screen';
 export default function Page() {
-  return <FutureScreen kind="scenarios" />;
+  return <ScenariosScreen />;
 }

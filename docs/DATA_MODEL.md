@@ -32,6 +32,14 @@ Monthly bonus, reimbursement, or deduction with company/employee, optional run, 
 
 Durable company, payroll, employee, and adjustment events with entity identifiers, action, message, optional monetary/period metadata, and createdAt. Index: `by_company`. Creation, calculation, approvals, finalization, adjustment decisions, and salary revisions write activity transactionally. The Activity page returns the newest 100. There is no authenticated actor identity in M2.
 
+### scenarios
+
+Saved what-if summary with company, name, period, target type/identifier, subject label, raise basis points, affected count, baseline/projected base and net totals, monthly change, annualized change, and createdAt. Index: `by_company_period`. Values are immutable snapshots and never drive payroll calculation.
+
+### scenarioItems
+
+Affected-person snapshot with scenario/company/employee, display identity, department, baseline/projected base pay, baseline/projected net pay, and changes. Indexes: `by_scenario`, `by_employee`. Saving writes all items transactionally; discard removes them before the scenario header.
+
 ## Planned
 
-Scenarios, scenario items, AI actions, approval requests, and payslips. Effective-dated employment status and termination also remain future work.
+AI actions, approval requests, and payslips. Effective-dated employment status and termination also remain future work.

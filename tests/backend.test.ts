@@ -344,4 +344,133 @@ describe('Convex payroll operations', () => {
       }),
     ).rejects.toThrow('active employee');
   });
+  it('previews employee and department raises without changing source data', async () => {
+    const { t, companyId, people } = await setup();
+    const priya = people.find((person) => person.firstName === 'Priya')!;
+    const employeePreview = await t.query(api.scenarios.preview, {
+      companyId,
+      month: 9,
+      year: 2026,
+      targetType: 'employee',
+      employeeId: priya._id,
+      raiseBasisPoints: 1000,
+    });
+    expect(employeePreview).toMatchObject({
+      subjectLabel: 'Priya Nair',
+      affectedEmployeeCount: 1,
+      basePayChange: 1150000,
+      netPayChange: 1150000,
+      annualNetPayChange: 13800000,
+    });
+    expect(employeePreview.items[0]).toMatchObject({
+      baselineBasePay: 11500000,
+      projectedBasePay: 12650000,
+      baselineNetPay: 11820000,
+      projectedNetPay: 12970000,
+    });
+    const departmentPreview = await t.query(api.scenarios.preview, {
+      companyId,
+      month: 9,
+      year: 2026,
+      targetType: 'department',
+      department: 'Engineering',
+      raiseBasisPoints: 500,
+    });
+    expect(departmentPreview.affectedEmployeeCount).toBe(8);
+    expect(departmentPreview.netPayChange).toBe(departmentPreview.basePayChange);
+    expect(await t.query(api.scenarios.list, { companyId, month: 9, year: 2026 })).toEqual([]);
+  });
+  it('saves stable scenario snapshots and discards them without touching payroll', async () => {
+    const { t, companyId, people } = await setup();
+    const priya = people.find((person) => person.firstName === 'Priya')!;
+    const runsBefore = await t.query(api.payroll.list, { companyId });
+    const revisionsBefore = await t.run((ctx) => ctx.db.query('compensationRevisions').collect());
+    const scenarioId = await t.mutation(api.scenarios.create, {
+      companyId,
+      name: 'Engineering market adjustment',
+      month: 9,
+      year: 2026,
+      targetType: 'employee',
+      employeeId: priya._id,
+      raiseBasisPoints: 750,
+    });
+    const saved = await t.query(api.scenarios.detail, { companyId, scenarioId });
+    expect(saved.scenario.netPayChange).toBe(862500);
+    expect(saved.items).toHaveLength(1);
+    await t.run(async (ctx) => {
+      const revision = await ctx.db
+        .query('compensationRevisions')
+        .withIndex('by_employee_period', (q) => q.eq('employeeId', priya._id))
+        .order('desc')
+        .first();
+      await ctx.db.patch(revision!._id, { monthlySalary: 13000000 });
+    });
+    expect(
+      (await t.query(api.scenarios.detail, { companyId, scenarioId })).scenario.netPayChange,
+    ).toBe(862500);
+    await t.mutation(api.scenarios.discard, { companyId, scenarioId });
+    expect(await t.query(api.scenarios.list, { companyId, month: 9, year: 2026 })).toEqual([]);
+    expect(await t.query(api.payroll.list, { companyId })).toEqual(runsBefore);
+    expect((await t.run((ctx) => ctx.db.query('compensationRevisions').collect())).length).toBe(
+      revisionsBefore.length,
+    );
+    const activity = await t.query(api.activity.list, { companyId });
+    expect(activity.some((event) => event.action === 'saved')).toBe(true);
+    expect(activity.some((event) => event.action === 'discarded')).toBe(true);
+  });
+  it('validates scenario targets, names, percentages, and company boundaries', async () => {
+    const { t, companyId, people } = await setup();
+    const other = await t.run((ctx) =>
+      ctx.db.insert('companies', {
+        name: 'Other',
+        slug: 'scenario-other',
+        currency: 'INR',
+        country: 'IN',
+        createdAt: Date.now(),
+      }),
+    );
+    await expect(
+      t.query(api.scenarios.preview, {
+        companyId,
+        month: 9,
+        year: 2026,
+        targetType: 'employee',
+        employeeId: people[0]._id,
+        raiseBasisPoints: 0,
+      }),
+    ).rejects.toThrow('Raise');
+    await expect(
+      t.query(api.scenarios.preview, {
+        companyId,
+        month: 9,
+        year: 2026,
+        targetType: 'department',
+        department: 'Missing',
+        raiseBasisPoints: 100,
+      }),
+    ).rejects.toThrow('no eligible');
+    await expect(
+      t.mutation(api.scenarios.create, {
+        companyId,
+        name: 'x',
+        month: 9,
+        year: 2026,
+        targetType: 'employee',
+        employeeId: people[0]._id,
+        raiseBasisPoints: 100,
+      }),
+    ).rejects.toThrow('scenario name');
+    const scenarioId = await t.mutation(api.scenarios.create, {
+      companyId,
+      name: 'Valid scenario',
+      month: 9,
+      year: 2026,
+      targetType: 'employee',
+      employeeId: people[0]._id,
+      raiseBasisPoints: 100,
+    });
+    await expect(t.query(api.scenarios.detail, { companyId: other, scenarioId })).rejects.toThrow(
+      'not found',
+    );
+  });
 });

@@ -2,7 +2,7 @@
 
 **Payroll that thinks before you pay.**
 
-A real Next.js + Convex payroll operations app for the Modern Stack Hackathon. All money uses integer paise; deterministic services calculate payroll; humans approve financial changes. AI integrations arrive later.
+A real Next.js + Convex payroll and scenario-planning app for the Modern Stack Hackathon. All money uses integer paise; deterministic services calculate payroll and what-if impact; humans approve financial changes. AI integrations arrive later.
 
 ## Run locally
 
@@ -37,6 +37,7 @@ Open [PayFlow](http://127.0.0.1:3000). Seed is idempotent and never resets exist
 4. Adjustments → submit a pending bonus/reimbursement/deduction → approve or reject it. Only approval changes payroll.
 5. Open a person to inspect payroll history and effective-dated salary revisions or schedule a future salary change.
 6. Open Activity for the full audit trail. The `?period=YYYY-MM` selection survives navigation and reloads.
+7. Open Scenarios, choose one employee or a department, enter a percentage raise, and inspect monthly/annual impact. Save or discard the snapshot; real compensation and payroll do not change.
 
 The current development database keeps September ready for review so approval remains demonstrable. October includes a ₹20,000 bonus for Ananya and remains a draft. To demonstrate creation again, use another empty period rather than deleting saved runs.
 
@@ -58,7 +59,7 @@ Production preview after building:
 npm start
 ```
 
-Convex must remain running. Hosted deployment is outside Milestone 2.
+Convex must remain running. Hosted deployment is outside Milestone 3.
 
 ## Environment
 
@@ -78,4 +79,4 @@ All meaningful features, fixes, refactors, schema changes, and documentation cha
 
 ## Scope
 
-This is an unauthenticated local demo with fictional data. General employee editing, effective-dated employment status, authentication, proration, compliance, bank transfers, scenarios, AI integrations, PDFs, and email remain outside Milestone 2. Calculated payroll is immutable; adjustments and salary revisions that would alter it are blocked.
+This is an unauthenticated local demo with fictional data. General employee editing, effective-dated employment status, authentication, proration, compliance, bank transfers, scenario application, AI integrations, PDFs, and email remain outside Milestone 3. Calculated payroll and saved scenarios are immutable snapshots.

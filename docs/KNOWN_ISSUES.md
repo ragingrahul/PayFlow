@@ -6,7 +6,7 @@ No confirmed Milestone 2 defects.
 
 ## Intentional scope limitations
 
-No auth/access control, multi-company switching, general employee profile editing, effective-dated employment status/termination, hourly/day proration, taxes/EPF/ESI, bank payments, PDF, OpenAI, Inkeep, or Resend. Reopening or recalculating a calculated run is not supported. No dark theme is configured. Local backend and frontend processes must be running. No production-readiness or public deployment claim. These are roadmap boundaries, not defects.
+No auth/access control, multi-company switching, general employee profile editing, effective-dated employment status/termination, hourly/day proration, taxes/EPF/ESI, bank payments, PDF, OpenAI, Inkeep, or Resend. Reopening or recalculating a calculated run is not supported. Scenarios support positive percentage raises only and cannot be applied. No dark theme is configured. Local backend and frontend processes must be running. No production-readiness or public deployment claim. These are roadmap boundaries, not defects.
 
 ## Resolved
 

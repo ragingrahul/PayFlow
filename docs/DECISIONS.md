@@ -144,6 +144,30 @@ Calculated periods cannot accept new approvals or salary changes that would alte
 
 A tested reopen/recalculation design preserves the original snapshot and audit trail.
 
+## DEC-008 — Scenarios are immutable, isolated snapshots
+
+Date: 2026-09-27. Status: Accepted.
+
+### Context
+
+People need to compare raise costs without risking real compensation or payroll.
+
+### Decision
+
+Calculate raises in integer basis points with half-up paise rounding. Use saved payroll items as the baseline for calculated periods and current effective inputs for draft/future periods. Persist scenario summaries and affected-person snapshots. Provide save and discard only; do not expose apply.
+
+### Reason
+
+The result is reproducible, reviewable, and structurally separated from authoritative payroll mutations.
+
+### Consequences
+
+Saved scenarios do not drift when salaries or adjustments later change. Discard removes scenario records only and leaves a durable activity event. Applying a plan requires a future explicit revalidation and confirmation design.
+
+### Do not change unless
+
+The apply workflow preserves preview/version binding, explicit human confirmation, and atomic compensation writes.
+
 ## DEC-006 — Local-only foundation and honest future screens
 
 Date: 2026-09-27. Status: Accepted.
@@ -154,7 +178,7 @@ Authentication and external integrations are explicitly excluded; the UI still n
 
 ### Decision
 
-Bind Next.js to loopback, use anonymous local Convex, and label Scenarios/Copilot as planned with no pretend actions. Settings is a read-only workspace view. Default demo period is September 2026.
+Bind Next.js to loopback, use anonymous local Convex, and label unfinished features as planned with no pretend actions. Settings is a read-only workspace view. Default demo period is September 2026.
 
 ### Reason
 
@@ -162,7 +186,7 @@ A runnable real foundation without implying unfinished features work.
 
 ### Consequences
 
-No public hosting, cloud infrastructure, payments, compliance, or production-data safety claim. Seed contains fictional identities and example-domain emails. Period currently resets on full reload.
+No public hosting, cloud infrastructure, payments, compliance, or production-data safety claim. Seed contains fictional identities and example-domain emails. Period is validated URL state.
 
 ### Do not change unless
 
