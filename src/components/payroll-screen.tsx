@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useMutation, useQuery } from 'convex/react';
 import {
   Plus,
@@ -9,6 +10,7 @@ import {
   ArrowRight,
   Wallet,
   LockKeyhole,
+  FileText,
 } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import type { Id } from '../../convex/_generated/dataModel';
@@ -325,6 +327,9 @@ function RunDetail({ runId }: { runId: Id<'payrollRuns'> }) {
                   <th className="numeric">Deduction</th>
                   <th className="numeric">Net pay</th>
                   <th>Status</th>
+                  <th>
+                    <span className="sr-only">Payslip</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -350,6 +355,21 @@ function RunDetail({ runId }: { runId: Id<'payrollRuns'> }) {
                     <td className="numeric bold">{inr(item.netPay)}</td>
                     <td>
                       <Badge value={item.status} />
+                    </td>
+                    <td>
+                      {run.status === 'processed' ? (
+                        <Link
+                          className="icon-button"
+                          href={`/portal/${item.employeeId}/payslips/${item._id}`}
+                          aria-label={`Open ${item.employeeName} payslip`}
+                        >
+                          <FileText size={16} />
+                        </Link>
+                      ) : (
+                        <span className="muted" title="Available after finalization">
+                          —
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -43,6 +43,7 @@ export default defineSchema({
       v.literal('contractor'),
     ),
     joiningDate: v.string(),
+    leavingDate: v.optional(v.string()),
     status: v.union(v.literal('active'), v.literal('inactive')),
     baseMonthlySalary: v.number(),
     currency: v.literal('INR'),
@@ -187,6 +188,20 @@ export default defineSchema({
   })
     .index('by_company', ['companyId'])
     .index('by_thread', ['threadId']),
+  payslipDeliveries: defineTable({
+    companyId: v.id('companies'),
+    payrollRunId: v.id('payrollRuns'),
+    payrollItemId: v.id('payrollItems'),
+    employeeId: v.id('employees'),
+    recipient: v.string(),
+    status: v.union(v.literal('sending'), v.literal('sent'), v.literal('failed')),
+    providerMessageId: v.optional(v.string()),
+    error: v.optional(v.string()),
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index('by_company', ['companyId'])
+    .index('by_item', ['payrollItemId']),
   activityEvents: defineTable({
     companyId: v.id('companies'),
     entityType: v.string(),

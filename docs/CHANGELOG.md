@@ -1,5 +1,26 @@
 # Changelog
 
+## Milestone 5 — 2026-09-27
+
+### Added
+
+- Validated employee onboarding, profile editing, scheduled employment end, and reactivation with activity history.
+- Processed-payroll employee portal, detailed payslips, HR deep links, and printable A4 save-to-PDF layout.
+- Optional server-only Resend delivery with idempotency, delivery records, and honest missing-configuration states.
+- Public hackathon landing page, demo script, and hosted-deployment runbook.
+- Three backend lifecycle/payslip tests; 76 tests now pass.
+
+### Changed
+
+- Payroll, dashboard, and adjustment eligibility now share period-aware joining/leaving rules.
+- Contractor compensation is explicitly described as an agreed monthly amount.
+- People and processed-payroll screens link directly into the relevant employee portal record.
+
+### Fixed
+
+- Current inactive status no longer incorrectly removes a person from their eligible leaving month.
+- Adjustments now validate eligibility for their effective period instead of relying only on current employee status.
+
 ## Milestone 4 — 2026-09-27
 
 ### Added

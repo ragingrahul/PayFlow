@@ -34,6 +34,9 @@
 
 ## Milestone 5 — Hackathon Polish
 
-- [ ] Resend, employee portal, payslip presentation
-- [ ] Demo refinement, animations, landing page
-- [ ] Demo script, deployment, submission assets
+- [x] Employee creation/profile editing, effective offboarding, and monthly contractor clarity
+- [x] Employee portal preview and finalized-snapshot payslip presentation
+- [x] Browser print/PDF and server-only Resend delivery with audited outcomes
+- [x] Landing page, responsive transitions, demo flow, and deployment runbook
+- [ ] Live Resend delivery, live Copilot provider check, and public deployment with user-owned credentials
+- [ ] Final submission screenshots/video and hackathon form

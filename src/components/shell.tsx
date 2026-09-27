@@ -16,6 +16,7 @@ import {
   PanelLeftClose,
   Menu,
   History,
+  ReceiptText,
 } from 'lucide-react';
 import { api } from '../../convex/_generated/api';
 import type { Doc } from '../../convex/_generated/dataModel';
@@ -39,6 +40,7 @@ const nav = [
   { href: '/activity', label: 'Activity', icon: History },
   { href: '/scenarios', label: 'Scenarios', icon: FlaskConical },
   { href: '/copilot', label: 'Copilot', icon: Sparkles },
+  { href: '/portal', label: 'Employee portal', icon: ReceiptText },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
   const company = useQuery(api.workspace.current);
@@ -66,6 +68,41 @@ export function Shell({ children }: { children: React.ReactNode }) {
   }, []);
   const title =
     nav.find((n) => (n.href === '/' ? path === '/' : path.startsWith(n.href)))?.label ?? 'Settings';
+  const workspaceValue = company
+    ? {
+        company,
+        month,
+        year,
+        setPeriod: (nextMonth: number, nextYear: number) => {
+          const params = new URLSearchParams(searchParams.toString());
+          params.set('period', `${nextYear}-${String(nextMonth).padStart(2, '0')}`);
+          router.replace(`${path}?${params.toString()}`, { scroll: false });
+        },
+      }
+    : null;
+  if (path === '/welcome') return <div className="landing-shell">{children}</div>;
+  if (path.startsWith('/portal') && workspaceValue)
+    return (
+      <WorkspaceContext.Provider value={workspaceValue}>
+        <div className="portal-shell">
+          <header className="portal-topbar no-print">
+            <Link href="/portal" className="brand portal-brand">
+              <span className="brand-mark">
+                <span /> <span /> <span />
+              </span>
+              payflow<span className="brand-period">.</span>
+            </Link>
+            <span className="preview-pill">EMPLOYEE PREVIEW</span>
+            <Link href={`/?period=${parsedPeriod}`} className="button compact">
+              HR workspace <ArrowUpRight size={14} />
+            </Link>
+          </header>
+          <main id="main" className="portal-main">
+            {children}
+          </main>
+        </div>
+      </WorkspaceContext.Provider>
+    );
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
@@ -183,18 +220,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               </p>
             </Empty>
           ) : (
-            <WorkspaceContext.Provider
-              value={{
-                company,
-                month,
-                year,
-                setPeriod: (nextMonth, nextYear) => {
-                  const params = new URLSearchParams(searchParams.toString());
-                  params.set('period', `${nextYear}-${String(nextMonth).padStart(2, '0')}`);
-                  router.replace(`${path}?${params.toString()}`, { scroll: false });
-                },
-              }}
-            >
+            <WorkspaceContext.Provider value={workspaceValue!}>
               {children}
             </WorkspaceContext.Provider>
           )}

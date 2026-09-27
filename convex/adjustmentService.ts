@@ -2,7 +2,7 @@ import type { MutationCtx, QueryCtx } from './_generated/server';
 import type { Id } from './_generated/dataModel';
 import type { AdjustmentType } from '../src/lib/payroll';
 import { money, validatePeriod } from '../src/lib/payroll';
-import { recordActivity, requireCompany } from './payrollService';
+import { employeeEligibleForPeriod, recordActivity, requireCompany } from './payrollService';
 
 export async function editableRun(
   ctx: QueryCtx | MutationCtx,
@@ -42,10 +42,10 @@ export async function createPendingAdjustment(
   if (!title || title.length > 120)
     throw new Error('Provide a title between 1 and 120 characters.');
   const employee = await ctx.db.get(args.employeeId);
-  if (!employee || employee.companyId !== args.companyId || employee.status !== 'active')
-    throw new Error('Choose an active employee in this company.');
-  const lastDay = new Date(Date.UTC(args.year, args.month, 0)).toISOString().slice(0, 10);
-  if (employee.joiningDate > lastDay) throw new Error('Employee has not joined in this period.');
+  if (!employee || employee.companyId !== args.companyId)
+    throw new Error('Choose an employee in this company.');
+  if (!employeeEligibleForPeriod(employee, args.month, args.year))
+    throw new Error('Employee is not eligible in this period.');
   await editableRun(ctx, args.companyId, args.month, args.year);
   const id = await ctx.db.insert('adjustments', {
     companyId: args.companyId,

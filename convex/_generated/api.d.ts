@@ -18,6 +18,7 @@ import type * as employees from "../employees.js";
 import type * as migrations from "../migrations.js";
 import type * as payroll from "../payroll.js";
 import type * as payrollService from "../payrollService.js";
+import type * as payslips from "../payslips.js";
 import type * as scenarios from "../scenarios.js";
 import type * as seed from "../seed.js";
 import type * as workspace from "../workspace.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   migrations: typeof migrations;
   payroll: typeof payroll;
   payrollService: typeof payrollService;
+  payslips: typeof payslips;
   scenarios: typeof scenarios;
   seed: typeof seed;
   workspace: typeof workspace;

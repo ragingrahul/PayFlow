@@ -197,7 +197,7 @@ describe('Convex payroll operations', () => {
         amount: 100,
         title: 'Cross company',
       }),
-    ).rejects.toThrow('active employee');
+    ).rejects.toThrow('employee in this company');
     const runs = await t.query(api.payroll.list, { companyId });
     await expect(
       t.mutation(api.payroll.generate, { companyId: other, runId: runs[0]._id }),
@@ -318,7 +318,7 @@ describe('Convex payroll operations', () => {
         amount: 100,
         title: 'Too early',
       }),
-    ).rejects.toThrow('has not joined');
+    ).rejects.toThrow('not eligible');
   });
   it('refuses empty payroll and deleted employee adjustment targets', async () => {
     const { t, companyId, people } = await setup();
@@ -342,7 +342,7 @@ describe('Convex payroll operations', () => {
         amount: 1,
         title: 'Missing',
       }),
-    ).rejects.toThrow('active employee');
+    ).rejects.toThrow('employee');
   });
   it('previews employee and department raises without changing source data', async () => {
     const { t, companyId, people } = await setup();
@@ -678,5 +678,168 @@ describe('Convex payroll operations', () => {
       assistantText: 'The saved payroll total comes from the calculated snapshot.',
     });
     expect(answer.proposalId).toBeUndefined();
+  });
+  it('creates and edits employees with unique identity and audited starting compensation', async () => {
+    const { t, companyId } = await setup();
+    const employeeId = await t.mutation(api.employees.create, {
+      companyId,
+      employeeCode: ' pf-025 ',
+      firstName: 'Maya',
+      lastName: 'Sen',
+      email: 'MAYA.SEN@ACME.EXAMPLE',
+      department: 'Finance',
+      jobTitle: 'Payroll Specialist',
+      employmentType: 'full_time',
+      joiningDate: '2026-09-15',
+      monthlySalary: 9200000,
+    });
+    const created = await t.query(api.employees.detail, {
+      companyId,
+      employeeId,
+      month: 9,
+      year: 2026,
+    });
+    expect(created?.employee).toMatchObject({
+      employeeCode: 'PF-025',
+      email: 'maya.sen@acme.example',
+      currentMonthlySalary: 9200000,
+      status: 'active',
+    });
+    expect(created?.compensationRevisions).toHaveLength(1);
+    expect(created?.compensationRevisions[0]).toMatchObject({
+      monthlySalary: 9200000,
+      effectiveMonth: 9,
+      effectiveYear: 2026,
+      reason: 'Starting compensation',
+    });
+    await t.mutation(api.employees.updateProfile, {
+      companyId,
+      employeeId,
+      employeeCode: 'PF-025',
+      firstName: 'Maya',
+      lastName: 'Sen',
+      email: 'maya.sen@acme.example',
+      department: 'Operations',
+      jobTitle: 'Payroll Operations Specialist',
+      employmentType: 'full_time',
+      joiningDate: '2026-09-15',
+    });
+    expect(
+      (await t.query(api.employees.detail, { companyId, employeeId }))?.employee,
+    ).toMatchObject({ department: 'Operations', jobTitle: 'Payroll Operations Specialist' });
+    await expect(
+      t.mutation(api.employees.create, {
+        companyId,
+        employeeCode: 'PF-025',
+        firstName: 'Duplicate',
+        lastName: 'Code',
+        email: 'another@acme.example',
+        department: 'Finance',
+        jobTitle: 'Analyst',
+        employmentType: 'full_time',
+        joiningDate: '2026-10-01',
+        monthlySalary: 5000000,
+      }),
+    ).rejects.toThrow('code already exists');
+    const activity = await t.query(api.activity.list, { companyId });
+    expect(activity.some((event) => event.action === 'created')).toBe(true);
+    expect(activity.some((event) => event.action === 'profile_updated')).toBe(true);
+  });
+  it('applies effective employment endings without rewriting calculated payroll', async () => {
+    const { t, companyId, people } = await setup();
+    const employee = people.find((person) => person.firstName === 'Tara')!;
+    await expect(
+      t.mutation(api.employees.deactivate, {
+        companyId,
+        employeeId: employee._id,
+        leavingDate: '2026-07-31',
+      }),
+    ).rejects.toThrow('calculated payroll');
+    await t.mutation(api.employees.deactivate, {
+      companyId,
+      employeeId: employee._id,
+      leavingDate: '2026-10-15',
+    });
+    const october = await t.query(api.dashboard.summary, { companyId, month: 10, year: 2026 });
+    const november = await t.query(api.dashboard.summary, { companyId, month: 11, year: 2026 });
+    expect(october.employeeCount).toBe(24);
+    expect(november.employeeCount).toBe(23);
+    const octoberAdjustment = await t.mutation(api.adjustments.create, {
+      companyId,
+      employeeId: employee._id,
+      month: 10,
+      year: 2026,
+      type: 'reimbursement',
+      amount: 10000,
+      title: 'Final expense',
+    });
+    expect(octoberAdjustment).toBeDefined();
+    await expect(
+      t.mutation(api.adjustments.create, {
+        companyId,
+        employeeId: employee._id,
+        month: 11,
+        year: 2026,
+        type: 'reimbursement',
+        amount: 10000,
+        title: 'Too late',
+      }),
+    ).rejects.toThrow('not eligible');
+    await t.mutation(api.employees.reactivate, { companyId, employeeId: employee._id });
+    const reactivated = (
+      await t.query(api.employees.detail, { companyId, employeeId: employee._id })
+    )?.employee;
+    expect(reactivated).toMatchObject({ status: 'active' });
+    expect(reactivated).not.toHaveProperty('leavingDate');
+  });
+  it('exposes payslips only for processed snapshots and audits delivery outcomes', async () => {
+    const { t, companyId, people } = await setup();
+    const employee = people.find((person) => person.firstName === 'Ananya')!;
+    const payslips = await t.query(api.payslips.listForEmployee, {
+      companyId,
+      employeeId: employee._id,
+    });
+    expect(payslips).toHaveLength(1);
+    expect(payslips[0].run?.status).toBe('processed');
+    const payrollItemId = payslips[0].item._id;
+    let detail = await t.query(api.payslips.detail, { companyId, payrollItemId });
+    expect(detail).toMatchObject({
+      employee: { email: 'ananya.sharma@acme.example' },
+      item: { employeeName: 'Ananya Sharma' },
+      deliveries: [],
+    });
+    const deliveryId = await t.mutation(api.payslips.beginDelivery, {
+      companyId,
+      payrollItemId,
+    });
+    await t.mutation(api.payslips.completeDelivery, {
+      companyId,
+      deliveryId,
+      status: 'sent',
+      providerMessageId: 'email_123',
+    });
+    detail = await t.query(api.payslips.detail, { companyId, payrollItemId });
+    expect(detail.deliveries[0]).toMatchObject({
+      status: 'sent',
+      recipient: 'ananya.sharma@acme.example',
+      providerMessageId: 'email_123',
+    });
+    await expect(
+      t.mutation(api.payslips.completeDelivery, {
+        companyId,
+        deliveryId,
+        status: 'failed',
+        error: 'Duplicate completion',
+      }),
+    ).rejects.toThrow('already complete');
+    const septemberId = await t.mutation(api.payroll.create, { companyId, month: 9, year: 2026 });
+    await t.mutation(api.payroll.generate, { companyId, runId: septemberId });
+    const september = await t.query(api.payroll.detail, { companyId, runId: septemberId });
+    await expect(
+      t.query(api.payslips.detail, {
+        companyId,
+        payrollItemId: september.items[0]._id,
+      }),
+    ).rejects.toThrow('only after payroll is finalized');
   });
 });

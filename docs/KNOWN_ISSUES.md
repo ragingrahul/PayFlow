@@ -2,11 +2,11 @@
 
 ## Active
 
-No confirmed Milestone 4 defects.
+No confirmed Milestone 5 defects.
 
 ## Intentional scope limitations
 
-No auth/access control, multi-company switching, general employee profile editing, effective-dated employment status/termination, hourly/day proration, taxes/EPF/ESI, bank payments, PDF, or Resend. Reopening or recalculating a calculated run is not supported. Scenarios support positive percentage raises only and cannot be applied. Copilot supports adjustment proposals only and cannot approve them. Live OpenAI or Inkeep execution requires server-side credentials; none are present in the verified local environment, so live provider calls remain unexercised while the setup state is active. No dark theme is configured. Local backend and frontend processes must be running. No production-readiness or public deployment claim. These are roadmap boundaries, not defects.
+No production auth/RBAC, multi-company switching, hourly timesheets, day-level proration, taxes/EPF/ESI, bank payments, or direct server PDF generation. Employee portal access is an explicitly labeled preview; browser print provides PDF export. Reopening or recalculating a calculated run is unsupported. Scenarios remain positive-raise snapshots and cannot be applied. Copilot cannot approve its proposals. Live OpenAI, Inkeep, and Resend execution requires server-side credentials; none were present in the verified local environment. Public deployment also requires a hosted Convex deployment. These are explicit hackathon boundaries, not defects.
 
 ## Resolved
 

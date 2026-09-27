@@ -24,4 +24,4 @@ Real bank transfers; full tax compliance; EPF/ESI; government filing; production
 
 ## Demo story
 
-Open the INR demo workspace, inspect employee and payroll metrics, review September payroll, and inspect compensation history. In Scenarios, model an employee or department raise without changing payroll. In Copilot, ask a payroll question or request an October adjustment, inspect the structured proposal, reject it with a correction or confirm it, then approve the resulting pending record in Adjustments.
+Open the landing page, enter the INR demo workspace, inspect employee and payroll metrics, and review September payroll. Add a future employee or schedule an employment end without rewriting payroll history. In Scenarios, model a raise without changing payroll. In Copilot, ask a question or prepare an October adjustment, then use the normal approval flow. Finalize payroll, switch to the employee portal preview, open the immutable payslip, and demonstrate print/PDF or configured Resend delivery.

@@ -1,6 +1,6 @@
 import { query } from './_generated/server';
 import { v } from 'convex/values';
-import { periodInputs, requireCompany } from './payrollService';
+import { employeeEligibleForPeriod, periodInputs, requireCompany } from './payrollService';
 import { addMoney, payrollChange, validatePeriod } from '../src/lib/payroll';
 export const summary = query({
   args: { companyId: v.id('companies'), month: v.number(), year: v.number() },
@@ -57,7 +57,9 @@ export const summary = query({
       netPay,
       employeeCount: rows.length,
       contractorCount: allEmployees.filter(
-        (e) => e.status === 'active' && e.employmentType === 'contractor',
+        (employee) =>
+          employee.employmentType === 'contractor' &&
+          employeeEligibleForPeriod(employee, month, year),
       ).length,
       run,
       previous,

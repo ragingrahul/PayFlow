@@ -1,5 +1,34 @@
 # Test Log
 
+## 2026-09-27 — Milestone 5
+
+### Automated checks
+
+- `npm test -- --run` — **76 tests passed across 3 files**.
+- `npm run lint`, `npm run typecheck`, and `npm run format:check` — passed.
+- `npx next build --webpack` — passed with 16 routes, including dynamic payslip email and portal detail routes.
+- The default Turbopack build reached its known sandbox-only CSS worker-port restriction even after an approved retry; Webpack compiled the same application, ran TypeScript, generated every static page, and collected build traces successfully.
+- `npm run smoke` — persisted September payroll still has 24 items and 216845050 paise.
+- New backend checks cover profile/compensation creation, company-unique code and email, profile editing, calculated-history protection, full leaving-month inclusion, later exclusion, adjustment eligibility, reactivation, processed-only payslips, and delivery completion guards.
+
+### Real browser checks
+
+- Public `/welcome` landing page rendered the hackathon story, workflow, trust boundary, and workspace/portal entry points.
+- Employee portal directory rendered 24 people in a dedicated preview shell with clear no-auth language.
+- Ananya's portal showed the processed August payslip; the detail rendered the immutable ₹1,60,000 snapshot and print/save-PDF action.
+- Payslip email stayed disabled without credentials and named `RESEND_API_KEY` and `RESEND_FROM_EMAIL`; no delivery was simulated.
+- People showed the Add person form, validation fields, agreed-monthly contractor wording, and a safe October 2026 default start because September is already calculated.
+- No employee, payroll, adjustment, payslip-delivery, or provider record was written during browser verification.
+
+### External-service status
+
+- No Resend/OpenAI/Inkeep credentials or hosted Convex deployment were available, so live provider calls and public hosting remain credential-dependent acceptance checks.
+- The email route and provider configuration states compile in production; deterministic delivery persistence is covered locally.
+
+### Result
+
+PASS for Milestone 5 application scope. Employee lifecycle, processed payslips, portal preview, print output, optional email boundary, landing page, and runbooks are complete. Production identity, statutory payroll, real payment rails, provider acceptance, and hosted deployment remain explicit follow-up work.
+
 ## 2026-09-27 — Milestone 4
 
 ### Automated checks

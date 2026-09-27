@@ -215,3 +215,51 @@ No public hosting, cloud infrastructure, payments, compliance, or production-dat
 ### Do not change unless
 
 Deployment/auth or the corresponding feature milestone is explicitly implemented and verified.
+
+## DEC-010 — Payslips derive from processed payroll snapshots
+
+Date: 2026-09-27. Status: Accepted.
+
+### Context
+
+Employees need a stable payslip without creating a second financial source of truth.
+
+### Decision
+
+Expose payslips only for processed payroll runs and derive every financial value from the immutable payroll item. Store email delivery state separately without copying money. Use browser print styles for the MVP PDF path.
+
+### Reason
+
+The payslip remains identical to the approved payroll record, and delivery retries cannot change or duplicate financial data.
+
+### Consequences
+
+Ready-for-review and approved runs do not produce payslips. Provider credentials are required for email; a missing provider is shown honestly. Server-rendered PDF storage remains future work.
+
+### Do not change unless
+
+A versioned document-generation design proves its output against the same immutable payroll item.
+
+## DEC-011 — Employment end dates use full-month eligibility
+
+Date: 2026-09-27. Status: Accepted.
+
+### Context
+
+The MVP has agreed monthly compensation and no daily proration, so a mid-month leaving date needs a simple deterministic rule.
+
+### Decision
+
+An employee is eligible for the full leaving month and excluded from the next month onward. Joining remains eligible when it occurs by month end. Reject lifecycle changes that would alter any calculated run.
+
+### Reason
+
+This matches the monthly compensation model and preserves saved payroll populations without pretending to calculate daily earnings.
+
+### Consequences
+
+Mid-month proration, hourly contractor time, and statutory final settlements are outside the MVP. Reactivation removes the leaving date only when doing so cannot change calculated history.
+
+### Do not change unless
+
+A documented proration policy and migration are implemented with tests.

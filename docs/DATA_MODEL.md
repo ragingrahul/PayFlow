@@ -10,7 +10,7 @@ Payroll workspace with name, slug, INR currency, India country, and createdAt. `
 
 ### employees
 
-Current profile with company, employee code, name, email, department, title, employment type, joining date, active/inactive status, compatibility `baseMonthlySalary`, currency, and createdAt. Indexes: `by_company`, `by_company_code`. Calculation includes active people joined by the chosen month-end. Effective salary comes from compensation revisions; employment status is not effective-dated yet.
+Current profile with company, employee code, name, email, department, title, employment type, joining date, optional leaving date, active/inactive administrative status, compatibility `baseMonthlySalary`, currency, and createdAt. Indexes: `by_company`, `by_company_code`. Code and email are unique within a company. Calculation includes people who joined by period end and have not left before period start. A lifecycle edit cannot change eligibility for an existing calculated run. Effective salary comes from compensation revisions.
 
 ### compensationRevisions
 
@@ -30,7 +30,7 @@ Monthly bonus, reimbursement, or deduction with company/employee, optional run, 
 
 ### activityEvents
 
-Durable company, payroll, employee, adjustment, scenario, and Copilot events with entity identifiers, action, message, optional monetary/period metadata, and createdAt. Index: `by_company`. Financial decisions and proposal lifecycle changes write activity transactionally. The Activity page returns the newest 100. There is no authenticated actor identity in M4.
+Durable company, payroll, employee, adjustment, scenario, Copilot, and payslip-delivery events with entity identifiers, action, message, optional monetary/period metadata, and createdAt. Index: `by_company`. Financial decisions and lifecycle changes write activity transactionally. The Activity page returns the newest 100. There is no authenticated actor identity in Milestone 5.
 
 ### scenarios
 
@@ -52,6 +52,10 @@ Ordered user/assistant transcript entries with `text | proposal | decision` kind
 
 Validated adjustment proposal with company/thread, provider, employee snapshot, period, adjustment type, integer-paise amount, title/rationale, baseline/projected payroll, exact source-version serialization, `pending | applied | rejected` status, and optional adjustment/rejection decision fields. Indexes: `by_company`, `by_thread`. Confirmation succeeds only when current deterministic inputs exactly match the saved source version.
 
+### payslipDeliveries
+
+Operational record for one processed payroll item email: company, run, item, employee, recipient, `sending | sent | failed` status, optional provider message ID/error, and start/completion timestamps. Indexes: `by_company`, `by_item`. Financial amounts are deliberately absent; payslip money always comes from the immutable payroll item. A delivery can complete only once.
+
 ## Planned
 
-Payslips and employee portal records. Effective-dated employment status and termination also remain future work.
+Production identity/session records, hourly contractor timesheets, statutory deductions/tax documents, bank transfer reconciliation, and server-generated PDF artifacts.

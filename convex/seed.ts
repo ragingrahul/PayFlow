@@ -91,7 +91,7 @@ export const demo = internalMutation({
     assertTransition('ready_for_review', 'approved');
     await ctx.db.patch(aug, { status: 'approved', approvedAt: Date.UTC(2026, 7, 28) });
     assertTransition('approved', 'processed');
-    await ctx.db.patch(aug, { status: 'processed' });
+    await ctx.db.patch(aug, { status: 'processed', processedAt: Date.UTC(2026, 7, 29) });
     // A genuine salary change after August snapshot, with audit history.
     await ctx.db.patch(ids[2], { baseMonthlySalary: 11500000 });
     await ctx.db.insert('compensationRevisions', {

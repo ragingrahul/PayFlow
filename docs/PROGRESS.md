@@ -1,46 +1,45 @@
 # Current Milestone
 
-Milestone 4 — AI Payroll Copilot
+Milestone 5 — Employee-to-payslip lifecycle and hackathon polish
 
 # Goal
 
-Let payroll operators ask natural-language questions and prepare reviewable adjustments while deterministic code retains authority over employees, money, impact, and mutations.
+Complete the credible hackathon lifecycle from employee onboarding through immutable payslips, then present it through a polished landing page and repeatable demo/deployment path.
 
 # Current Status
 
-Milestone 4 is implemented and verified locally. OpenAI Responses function calling is the default provider; an Inkeep Chat API tool-calling adapter uses the same controlled tools. Conversations and proposals persist in Convex. Live external-provider execution awaits user-supplied credentials; the unconfigured browser state is verified and does not simulate responses.
+Milestone 5 application work is implemented locally. People can be created, edited, effectively offboarded, and reactivated without changing calculated snapshots. Employee portal payslips derive only from processed payroll items. Browser print/PDF and a server-only Resend delivery route are available; missing credentials disable delivery honestly. The landing page and demo/deployment runbooks are in place.
 
 # Completed
 
-- [x] OpenAI Responses API tool loop using the official JavaScript SDK and `store: false`.
-- [x] Inkeep OpenAI-compatible Chat API tool loop with server-only credentials.
-- [x] Deterministic read tools for payroll context, employee lookup, and adjustment filtering.
-- [x] Structured bonus, reimbursement, and deduction proposal tool with exact INR-to-paise parsing.
-- [x] Convex-backed conversations, messages, proposal previews, status, and activity.
-- [x] Proposal source snapshot and confirmation-time revalidation.
-- [x] Explicit confirm creates a pending adjustment only; the existing Adjustments approval remains mandatory.
-- [x] Rejection reason becomes conversation context for a corrected follow-up.
-- [x] Honest missing-provider setup state with disabled chat.
-- [x] 73 tests, lint, typecheck, formatting, production build, persisted-data smoke, and browser UI verification.
+- [x] Validated employee creation and profile editing with unique code/email enforcement.
+- [x] Effective leaving date and reactivation workflows with calculated-run eligibility protection.
+- [x] Full-month contractor compensation explicitly represented as monthly MVP compensation.
+- [x] Processed-run-only employee payslip queries with no duplicated financial source of truth.
+- [x] Separate employee portal preview, printable A4 payslip, and HR deep links.
+- [x] Server-only Resend delivery route with sending/sent/failed audit records and activity.
+- [x] Honest missing-email-configuration state; no simulated delivery.
+- [x] Public landing page, responsive motion, demo script, and deployment runbook.
+- [x] 76 tests, lint, typecheck, formatting, production build, persisted-data smoke, and browser UI verification.
 
 # In Progress
 
-- None. Milestone 4 application work is complete.
+- Final external-provider and hosted-deployment checks require user-owned credentials.
 
 # Next Actions
 
-1. Add one provider’s server-side credentials and run live OpenAI or Inkeep conversation checks.
-2. Start Milestone 5 with the employee portal and payslip presentation.
-3. Add Resend only when the payslip artifact and recipient flow are ready.
+1. Configure Resend and run one delivery to an authorized test recipient.
+2. Configure OpenAI or Inkeep and run the live Copilot acceptance flow.
+3. Provision Convex cloud and a hosting project, then capture final submission assets.
 
 # Blockers
 
-- Live external-provider calls cannot be exercised until `OPENAI_API_KEY` or the three Inkeep variables are supplied. All local deterministic and persistence paths are verified.
+- Live Resend/OpenAI/Inkeep calls and public deployment cannot be exercised without provider credentials and a user-owned hosted Convex deployment.
 
 # Important Current Context
 
-Copilot never calls arbitrary Convex mutations. Its provider tools read a bounded context and may return one proposal draft. `recordTurn` resolves and recalculates that draft in Convex. `confirmProposal` compares the current source snapshot to the saved proposal, then creates one pending adjustment transactionally. Payroll changes only after a separate adjustment approval.
+The employee portal is explicitly a preview because the hackathon app has no production identity layer. Payslip financial data is read directly from immutable processed payroll items. Delivery state is separate operational metadata. Employee leaving dates use a full-month policy: eligible through the leaving month and excluded afterward.
 
 # Last Verified
 
-2026-09-27 (Asia/Kolkata): 73 tests across three files, lint, typecheck, format check, production build with 11 routes, persisted September smoke at 216845050 paise, and desktop-browser verification of the Copilot setup state and human-approval messaging.
+2026-09-27 (Asia/Kolkata): 76 tests across three files, lint, typecheck, format check, Webpack production build with 16 routes, persisted September smoke at 216845050 paise, and desktop-browser verification of the landing page, employee lifecycle form, portal directory, processed payslip, print action, and missing-email-configuration state. The default Turbopack build remains blocked in this execution sandbox by its CSS worker-port restriction.

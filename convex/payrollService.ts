@@ -14,6 +14,18 @@ export async function requireCompany(ctx: QueryCtx | MutationCtx, companyId: Id<
   if (!company) throw new Error('Company not found.');
   return company;
 }
+export function employeeEligibleForPeriod(
+  employee: Pick<Doc<'employees'>, 'joiningDate' | 'leavingDate' | 'status'>,
+  month: number,
+  year: number,
+) {
+  validatePeriod(month, year);
+  const firstDay = `${year}-${String(month).padStart(2, '0')}-01`;
+  const lastDay = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
+  if (employee.joiningDate > lastDay) return false;
+  if (employee.leavingDate) return employee.leavingDate >= firstDay;
+  return employee.status === 'active';
+}
 export function runTotals(t: ReturnType<typeof zeroAmounts>) {
   return {
     totalBasePay: t.basePay,
@@ -32,13 +44,12 @@ export async function periodInputs(
   runId?: Id<'payrollRuns'>,
 ) {
   validatePeriod(month, year);
-  const lastDay = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
   const employees = (
     await ctx.db
       .query('employees')
       .withIndex('by_company', (q) => q.eq('companyId', companyId))
       .collect()
-  ).filter((e) => e.status === 'active' && e.joiningDate <= lastDay);
+  ).filter((employee) => employeeEligibleForPeriod(employee, month, year));
   const adjustments = (
     await ctx.db
       .query('adjustments')
