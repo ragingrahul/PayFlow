@@ -16,8 +16,8 @@ PayFlow should be remembered as the payroll project where HR can ask what a rais
 | Build announcement   | Ready to review                  | Landing and dashboard screenshots are captured from the real local app.                                          |
 | Scenario Mode post   | Ready to review                  | Real October preview: 8 Engineering employees, +₹71,200/month, +₹8,54,400/year.                                  |
 | AI architecture post | Copy ready; video blocked        | Provider adapters and safety gates are implemented. A live OpenAI/Inkeep acceptance run still needs credentials. |
-| Convex realtime post | Copy ready; recording needed     | Realtime updates were browser-verified; a two-view recording still needs capture.                                |
-| Final launch post    | Blocked                          | Requires a public URL, live provider acceptance, final demo video, and submission link.                          |
+| Convex realtime post | Copy ready; recording needed     | Hosted Convex and realtime UI data are verified; a two-view recording still needs capture.                       |
+| Final launch post    | Blocked                          | Backend is hosted; requires a public frontend URL, live provider acceptance, final video, and submission link.   |
 | LinkedIn launch      | Draft ready; blocked with launch | Publish with the final URL and video.                                                                            |
 
 Do not present an item as launched until its link is recorded in `docs/DISTRIBUTION_LOG.md`.

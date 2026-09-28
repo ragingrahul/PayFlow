@@ -23,7 +23,7 @@ Ask what an 8% Engineering raise would cost. Scenario Mode resolves the eligible
 
 ![PayFlow Scenario Mode showing an 8% Engineering raise](public/marketing/scenario-mode.png)
 
-Current seeded October example:
+Captured October example, including a fictional ₹20,000 bonus added during browser verification:
 
 - **8 people** affected
 - **₹21,10,000 → ₹21,81,200** projected monthly payroll
@@ -75,7 +75,9 @@ Convex is the application source of truth. The browser subscribes to typed queri
 - Local HR workspace: [http://127.0.0.1:3000/?period=2026-09](http://127.0.0.1:3000/?period=2026-09)
 - Local employee preview: [http://127.0.0.1:3000/portal](http://127.0.0.1:3000/portal)
 
-The current development database keeps September ready for review at ₹21,68,450.50. October remains a draft and includes a ₹20,000 approved performance bonus for Ananya. The seed is idempotent and never resets saved work.
+The local frontend is currently connected to the verified hosted Convex development deployment at `https://vivid-akita-75.eu-west-1.convex.cloud`. This is a backend API endpoint, not the public PayFlow website. Frontend hosting remains to be configured.
+
+The current hosted development database keeps September ready for review at ₹21,68,450.50. Its clean fictional seed leaves October as a ₹20,90,000 draft. The seed is idempotent and never resets saved work.
 
 Follow the [4–5 minute demo script](docs/DEMO_SCRIPT.md) for the complete employee-to-payslip story.
 
@@ -109,7 +111,7 @@ npm run seed
 npm run dev
 ```
 
-The Convex CLI writes `.env.local`, generates API bindings, and persists local data in `.convex/`. Do not commit either path. The first local backend run may require internet access.
+The Convex CLI writes `.env.local`, generates API bindings, and persists local data in `.convex/`. Do not commit either path. The first local backend run may require internet access. The existing `.convex/` database remains available even when `.env.local` selects the hosted development deployment.
 
 ## Optional providers
 

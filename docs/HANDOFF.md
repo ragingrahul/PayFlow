@@ -2,19 +2,19 @@
 
 ## Current State
 
-Working local Next.js + Convex payroll application through Milestone 5. It covers payroll operations, effective compensation, adjustment review, activity, isolated raise scenarios, human-confirmed Copilot proposals, employee onboarding/offboarding, processed payslips, a portal preview, and hackathon presentation material. The repository now also contains product-first README content, SVG brand assets, real product screenshots, social metadata, launch copy, media storyboards, and an empty truthful distribution log. September remains ready for review at ₹21,68,450.50; October remains a draft at ₹21,10,000.
+Working Next.js + Convex payroll application through Milestone 5. The local frontend currently uses the user-owned `vivid-akita-75` Convex cloud development deployment. It covers payroll operations, effective compensation, adjustment review, activity, isolated raise scenarios, human-confirmed Copilot proposals, employee onboarding/offboarding, processed payslips, a portal preview, and hackathon presentation material. The repository also contains product-first README content, SVG brand assets, real product screenshots, social metadata, launch copy, media storyboards, and an empty truthful distribution log. Hosted September remains ready for review at ₹21,68,450.50; October remains a draft at ₹20,90,000 after the clean fictional cloud seed.
 
 ## Current Milestone
 
-Milestone 5 application scope and launch-kit preparation are complete. Live Resend/OpenAI/Inkeep acceptance, hosted deployment, video rendering, and external publishing remain.
+Milestone 5 application scope, launch-kit preparation, and hosted Convex development backend are complete. Live Resend/OpenAI/Inkeep acceptance, public frontend hosting, video rendering, and external publishing remain.
 
 ## Last Thing Worked On
 
-Validated employee create/edit/end/reactivate workflows, period-aware eligibility, immutable processed-run payslips, delivery audit records, server-only Resend integration, printable A4 output, employee portal preview, public landing page, and demo/deployment runbooks.
+Connected the repository to the user-owned `vivid-akita-75` cloud development deployment, deployed the schema/functions/21 indexes, ran the fictional seed twice to prove idempotence, created and calculated September, and verified the hosted backend through the smoke suite and local frontend.
 
 ## Next Recommended Task
 
-Configure one Copilot provider, run its live acceptance flow with synthetic data, then deploy to a user-owned Convex and Next.js host. Approve the creative direction in `docs/MEDIA_PLAN.md` before creating the first X video. Add production identity/RBAC before using any real employee data.
+Deploy the Next.js frontend with the verified cloud Convex URL, configure `NEXT_PUBLIC_APP_URL`, and run a public desktop/mobile smoke check. Then configure one Copilot provider and run its live acceptance flow with synthetic data. Approve the creative direction in `docs/MEDIA_PLAN.md` before creating the first X video. Add production identity/RBAC before using any real employee data.
 
 ## Files Most Relevant
 
@@ -39,15 +39,15 @@ Employee eligibility is period-aware: joined by month end and not departed befor
 
 ## Known Limits
 
-The portal is a no-auth employee preview, not a private account. Contractors use agreed monthly amounts; there are no timesheets. Tax/statutory calculations, bank transfers, server-generated PDF storage, production identity/RBAC, pagination, and hosted operations remain outside Milestone 5. Live provider calls have not run because credentials are absent.
+The portal is a no-auth employee preview, not a private account. Contractors use agreed monthly amounts; there are no timesheets. Tax/statutory calculations, bank transfers, server-generated PDF storage, production identity/RBAC, pagination, and production operations remain outside Milestone 5. The hosted backend contains fictional data only. Live provider calls have not run because credentials are absent, and the frontend does not yet have a public host.
 
 ## Verification Status
 
-76 tests cover lifecycle creation/editing, uniqueness, calculated-history protection, leaving-month inclusion, later exclusion, reactivation, processed-only payslips, and delivery lifecycle in addition to all earlier payroll/Copilot coverage. Lint, typecheck, formatting, the 17-route Webpack production build, persisted-data smoke, browser captures, and rendered social metadata pass. The default Turbopack build is limited by this execution sandbox's CSS worker port. See `docs/TEST_LOG.md` for the exact results.
+76 tests cover lifecycle creation/editing, uniqueness, calculated-history protection, leaving-month inclusion, later exclusion, reactivation, processed-only payslips, and delivery lifecycle in addition to all earlier payroll/Copilot coverage. Lint, typecheck, formatting, the 17-route Webpack production build, cloud-persisted smoke, local-frontend/browser verification against cloud data, browser captures, and rendered social metadata pass. The default Turbopack build is limited by this execution sandbox's CSS worker port. See `docs/TEST_LOG.md` for the exact results.
 
 ## Environment Notes
 
-Run `npm install`; terminal 1 `npx convex dev`; terminal 2 `npm run seed` then `npm run dev`. Optional email requires `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `NEXT_PUBLIC_APP_URL`. Optional Copilot requires either OpenAI or Inkeep variables from `.env.example`. Secrets stay server-side. `.env.local` and `.convex` remain ignored.
+Run `npm install`, then `npm run dev`. The ignored `.env.local` selects `dev:vivid-akita-75` and `NEXT_PUBLIC_CONVEX_URL=https://vivid-akita-75.eu-west-1.convex.cloud`. Use `npx convex dev --once` to push future backend changes and `npm run smoke` to verify hosted state. The anonymous local database remains in ignored `.convex/` for recovery. Optional email requires `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `NEXT_PUBLIC_APP_URL`. Optional Copilot requires either OpenAI or Inkeep variables from `.env.example`. Secrets stay server-side. The separate `descriptive-crab-939` production deployment is untouched.
 
 ## Do Not Accidentally Change
 

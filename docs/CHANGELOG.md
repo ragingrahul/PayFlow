@@ -1,5 +1,23 @@
 # Changelog
 
+## Hosted Convex development deployment — 2026-09-27
+
+### Added
+
+- Deployed PayFlow's schema, functions, and 21 indexes to the user-owned `vivid-akita-75` Convex cloud development deployment.
+- Seeded only the fictional Acme Studio dataset, proved the seed is idempotent, and created the 24-person September payroll snapshot.
+- Verified the hosted backend with the full smoke command and the local Next.js frontend.
+
+### Changed
+
+- Local development now selects the hosted development deployment through the ignored `.env.local`; the anonymous `.convex/` database remains intact.
+- Deployment, progress, architecture, test, marketing, and handoff documentation now separate the hosted backend from the still-unhosted frontend.
+
+### Safety
+
+- The separate Convex production deployment was left untouched.
+- No credentials or deployment tokens were committed, and the cloud deployment contains fictional data only.
+
 ## Hackathon launch preparation — 2026-09-27
 
 ### Added

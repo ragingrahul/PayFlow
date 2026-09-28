@@ -6,7 +6,7 @@ No confirmed Milestone 5 defects.
 
 ## Intentional scope limitations
 
-No production auth/RBAC, multi-company switching, hourly timesheets, day-level proration, taxes/EPF/ESI, bank payments, or direct server PDF generation. Employee portal access is an explicitly labeled preview; browser print provides PDF export. Reopening or recalculating a calculated run is unsupported. Scenarios remain positive-raise snapshots and cannot be applied. Copilot cannot approve its proposals. Live OpenAI, Inkeep, and Resend execution requires server-side credentials; none were present in the verified local environment. Public deployment also requires a hosted Convex deployment. These are explicit hackathon boundaries, not defects.
+No production auth/RBAC, multi-company switching, hourly timesheets, day-level proration, taxes/EPF/ESI, bank payments, or direct server PDF generation. Employee portal access is an explicitly labeled preview; browser print provides PDF export. Reopening or recalculating a calculated run is unsupported. Scenarios remain positive-raise snapshots and cannot be applied. Copilot cannot approve its proposals. Live OpenAI, Inkeep, and Resend execution requires server-side credentials; none are configured. The Convex backend is hosted and verified, but the Next.js frontend still needs public hosting. These are explicit hackathon boundaries, not defects.
 
 ## Resolved
 

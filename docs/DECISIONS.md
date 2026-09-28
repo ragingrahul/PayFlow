@@ -194,7 +194,7 @@ A replacement design keeps provider output untrusted, binds approval to current 
 
 ## DEC-006 — Local-only foundation and honest future screens
 
-Date: 2026-09-27. Status: Accepted.
+Date: 2026-09-27. Status: Superseded by DEC-012 for deployment scope.
 
 ### Context
 
@@ -215,6 +215,30 @@ No public hosting, cloud infrastructure, payments, compliance, or production-dat
 ### Do not change unless
 
 Deployment/auth or the corresponding feature milestone is explicitly implemented and verified.
+
+## DEC-012 — Use the cloud development deployment before production
+
+Date: 2026-09-27. Status: Accepted.
+
+### Context
+
+The user supplied a Convex cloud URL for a project that has separate development and production deployments. PayFlow needs a shareable backend while it still has no production identity or authorization layer.
+
+### Decision
+
+Deploy schema and functions to `vivid-akita-75`, the project's cloud development deployment, and seed it only with the fictional Acme Studio dataset. Point the local frontend and future hackathon frontend host at that deployment until a deliberate production migration is approved. Keep the anonymous local database recoverable and leave `descriptive-crab-939` production untouched.
+
+### Reason
+
+This provides a real hosted, realtime backend for the demo without implying production readiness or placing employee data in an unauthenticated production system.
+
+### Consequences
+
+The `.convex.cloud` URL is the backend API endpoint, not a public PayFlow website. Frontend hosting and provider credentials are still separate tasks. Future Convex changes must be deployed to development and checked against fictional data before any production action.
+
+### Do not change unless
+
+Production identity, authorization, data handling, and deployment acceptance are explicitly designed and verified.
 
 ## DEC-010 — Payslips derive from processed payroll snapshots
 

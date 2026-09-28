@@ -39,5 +39,6 @@
 - [x] Browser print/PDF and server-only Resend delivery with audited outcomes
 - [x] Landing page, responsive transitions, demo flow, and deployment runbook
 - [x] Product-first README, reusable brand assets, real product screenshots, social metadata, launch copy, and distribution log
-- [ ] Live Resend delivery, live Copilot provider check, and public deployment with user-owned credentials
+- [x] Hosted Convex development backend, fictional seed, and cloud smoke/browser verification
+- [ ] Live Resend delivery, live Copilot provider check, and public frontend deployment
 - [ ] Final X/hackathon videos and hackathon form

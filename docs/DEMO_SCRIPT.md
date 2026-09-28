@@ -28,11 +28,11 @@ Open Employee portal and select a person with an August payslip. Open the paysli
 
 ## 7. Close — 20 seconds
 
-Return to `/welcome`. Summarize the demonstrated chain: onboard a person, review effective compensation and adjustments, lock payroll, and give the employee a stable payslip. State the remaining production work plainly: identity/RBAC, statutory calculations, bank integrations, and hosted operations.
+Return to `/welcome`. Summarize the demonstrated chain: onboard a person, review effective compensation and adjustments, lock payroll, and give the employee a stable payslip. State the remaining production work plainly: identity/RBAC, statutory calculations, bank integrations, public frontend hosting, and production operations.
 
 ## Pre-recording checklist
 
-- Start local Convex and Next.js; confirm the green realtime indicator.
+- Confirm `.env.local` selects the hosted `vivid-akita-75` development deployment, start Next.js, and check the green realtime indicator.
 - Run `npm run seed` and `npm run smoke`.
 - Use a clean browser window at 1280px or wider and keep zoom at 100%.
 - Decide in advance whether provider/email steps are live or configuration-state demonstrations.

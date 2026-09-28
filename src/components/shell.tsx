@@ -169,7 +169,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="avatar">HR</span>
             <div>
               <strong>Workspace admin</strong>
-              <small>Local demo session</small>
+              <small>Demo session · no auth</small>
             </div>
             <PanelLeftClose size={16} aria-hidden />
           </div>

@@ -4,7 +4,7 @@
 
 Next.js App Router UI → typed Convex queries/mutations → Convex database.
 
-Convex is the only payroll store. No localStorage, mock API, browser-side financial database, or fabricated dashboard metrics. Local anonymous Convex is a real persistent backend; the CLI maintains `.convex/` (gitignored). Start it alongside Next.js. No cloud deployment or account was created.
+Convex is the only payroll store. No localStorage, mock API, browser-side financial database, or fabricated dashboard metrics. The active demo backend is the user-owned `vivid-akita-75` Convex cloud development deployment at `https://vivid-akita-75.eu-west-1.convex.cloud`. Schema, functions, and 21 indexes are deployed there with fictional Acme Studio data. The earlier anonymous local backend remains recoverable in gitignored `.convex/`; the separate production deployment is untouched.
 
 ## Frontend structure
 
@@ -38,7 +38,7 @@ Period selection survives navigation, bookmarks, and full reloads. Invalid or ou
 - `convex/_generated`: official Convex-generated types and API bindings; do not hand-edit.
 - `src/lib/payroll.ts`: pure financial engine, currency parsing, aggregation, period validation, state machine.
 
-External model calls run in a Next.js Node route so provider secrets never reach the browser. Convex queries remain read-only and mutations remain atomic. Testing uses Vitest + convex-test and the real local browser/backend.
+External model calls run in a Next.js Node route so provider secrets never reach the browser. Convex queries remain read-only and mutations remain atomic. Testing uses Vitest + convex-test, a hosted-backend smoke command, and the real frontend in a browser.
 
 Email delivery follows the same boundary. The server route asks Convex for a processed-payroll projection, creates a `sending` delivery record, calls Resend with an idempotency key, and records `sent` or `failed`. Missing credentials disable the action in the UI; no delivery is simulated.
 
@@ -72,7 +72,7 @@ Dashboard, people, employee details, payroll, adjustments, and activity subscrib
 
 ## Demo boundaries
 
-24 employees, five departments, two monthly contractors, one part-time recent joiner. Agreed full monthly salaries; no day/hour proration. Processed August history uses 23 people; Priya’s raise occurs after that snapshot. September starts absent on a fresh seed so the creation workflow is demonstrable. October starts as a draft. The current verified database now has September ready for review and an October performance bonus from browser verification.
+24 employees, five departments, two monthly contractors, one part-time recent joiner. Agreed full monthly salaries; no day/hour proration. Processed August history uses 23 people; Priya’s raise occurs after that snapshot. September starts absent on a fresh seed so the creation workflow is demonstrable. October starts as a draft. The current verified cloud database has September ready for review; its clean fictional seed leaves October as a ₹20,90,000 draft with no extra browser-created adjustment.
 
 ## Copilot/tool boundary
 
@@ -92,6 +92,6 @@ No production authentication by explicit milestone scope. This is a development/
 
 ## Setup references
 
-Implementation followed the official [Convex local development guide](https://docs.convex.dev/cli/local-deployments), [Convex agent-mode setup](https://docs.convex.dev/cli/agent-mode), and [Next.js installation documentation](https://nextjs.org/docs/app/getting-started/installation). Installed versions are recorded in package-lock.json.
+Implementation followed the official [Convex local development guide](https://docs.convex.dev/cli/local-deployments), [Convex deployment documentation](https://docs.convex.dev/production/hosting), [Convex agent-mode setup](https://docs.convex.dev/cli/agent-mode), and [Next.js installation documentation](https://nextjs.org/docs/app/getting-started/installation). Installed versions are recorded in package-lock.json.
 
 Milestone 4 follows the official [OpenAI function-calling guide](https://developers.openai.com/api/docs/guides/function-calling), [Responses migration guidance](https://developers.openai.com/api/docs/guides/migrate-to-responses), [Inkeep Chat API](https://docs.inkeep.com/talk-to-your-agents/chat-api), and [Inkeep tool-approval guidance](https://docs.inkeep.com/typescript-sdk/tools/tool-approvals).

@@ -24,7 +24,7 @@ Before significant changes read: AGENTS.md → docs/PRODUCT.md → docs/ARCHITEC
 
 ## Current milestone
 
-See docs/PROGRESS.md: Milestone 5 application work and the launch-kit preparation are complete locally. Live provider acceptance, public deployment, video production, and submission remain.
+See docs/PROGRESS.md: Milestone 5 application work, the launch kit, and the hosted Convex development backend are complete. Live provider acceptance, public frontend hosting, video production, and submission remain.
 
 ## Commands
 

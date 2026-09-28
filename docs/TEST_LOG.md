@@ -1,5 +1,26 @@
 # Test Log
 
+## 2026-09-27 — Hosted Convex development deployment
+
+### Deployment checks
+
+- The supplied `https://vivid-akita-75.eu-west-1.convex.cloud` endpoint responded as Convex before deployment and correctly reported that `workspace:current` was not yet present.
+- Official Convex authentication confirmed `vivid-akita-75` belongs to `rahul-raj-sarma:payflow` and is the cloud development deployment; the separate `descriptive-crab-939` production deployment was left untouched.
+- `npx convex dev --once` deployed the schema, functions, generated API, and 21 indexes successfully.
+- First `npm run seed` created fictional Acme Studio with company ID `jd790th3he92t3q2n85nkabxf18f69z7`; the second returned the same ID with `seeded: false`.
+- September 2026 was created and calculated on the hosted deployment because a fresh seed intentionally leaves it absent for the demo workflow.
+
+### Hosted acceptance checks
+
+- `npm run smoke` passed against the cloud URL with 24 employees, September payroll items/totals, dashboard, activity, and employee history.
+- The exact hosted September total is **216845050 paise (₹21,68,450.50)**.
+- The local Next.js frontend loaded Acme Studio from the hosted backend, showed “Live updates,” 24 people, September ready for review, the exact total, department totals, and hosted activity.
+- Repointing ignored `.env.local` did not delete or overwrite the existing anonymous `.convex/` local database.
+
+### Result
+
+PASS for the hosted development backend. The Convex cloud URL is ready for a hosted frontend. Public Next.js hosting and live Resend/OpenAI/Inkeep acceptance remain separate work.
+
 ## 2026-09-27 — Hackathon launch-kit preparation
 
 ### Automated checks
